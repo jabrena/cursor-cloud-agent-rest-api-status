@@ -8,13 +8,14 @@ jobs:
     name: Scheduled Ping Agent Execution
     runs-on: ubuntu-latest
     timeout-minutes: 35
+    permissions:
+      contents: write
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v5
         with:
           submodules: true
-          token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Setup Java 25 with GraalVM
         uses: actions/setup-java@v5
