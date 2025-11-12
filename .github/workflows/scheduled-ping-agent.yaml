@@ -9,7 +9,7 @@ jobs:
   scheduled-ping-agent:
     name: Scheduled Ping Agent Execution
     runs-on: ubuntu-latest
-    timeout-minutes: 35
+    timeout-minutes: 5
     permissions:
       contents: write
 
@@ -39,8 +39,8 @@ jobs:
         env:
           CURSOR_API_KEY: ${{ secrets.CURSOR_API_KEY }}
         run: |
-          chmod +x scripts/execute-and-measure.sh
-          ./scripts/execute-and-measure.sh
+          chmod +x .github/scripts/execute-and-measure.sh
+          ./.github/scripts/execute-and-measure.sh
 
       - name: Commit and push measures.json
         run: |
