@@ -1,1 +1,5 @@
-# cursor-cloud-agent-rest-api-status
+# Cursor Cloud Agent REST API Status
+
+## References
+
+- https://status.cursor.com/

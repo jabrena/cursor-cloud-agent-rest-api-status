@@ -1,0 +1,52 @@
+name: Scheduled Ping Agent
+
+on:
+  workflow_dispatch:
+
+jobs:
+  scheduled-ping-agent:
+    name: Scheduled Ping Agent Execution
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+        with:
+          submodules: true
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Setup Java 25 with GraalVM
+        uses: actions/setup-java@v5
+        with:
+          distribution: 'graalvm'
+          java-version: '25'
+
+      - name: Setup jbang
+        run: |
+          curl -Ls https://sh.jbang.dev | bash -s - app setup
+          echo "$HOME/.jbang/bin" >> $GITHUB_PATH
+
+      - name: Install jq
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y jq
+
+      - name: Execute AOC Agent and Measure
+        env:
+          CURSOR_API_KEY: ${{ secrets.CURSOR_API_KEY }}
+        run: |
+          chmod +x scripts/execute-and-measure.sh
+          ./scripts/execute-and-measure.sh
+
+      - name: Commit and push measures.json
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add docs/measures.json
+          if git diff --staged --quiet; then
+            echo "No changes to commit"
+          else
+            git commit -m "Update measures.json with execution metrics [skip ci]"
+            git push origin main
+          fi

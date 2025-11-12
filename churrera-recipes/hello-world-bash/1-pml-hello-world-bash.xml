@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<prompt xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="https://jabrena.github.io/pml/schemas/0.3.0/pml.xsd">
+        
+    <goal>
+        Print "Hello World" in the console using a echo command
+    </goal>
+
+    <output-format>Not explain anything and show any output</output-format>
+</prompt>
