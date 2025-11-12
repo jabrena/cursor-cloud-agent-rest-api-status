@@ -2,6 +2,8 @@ name: Scheduled Ping Agent
 
 on:
   workflow_dispatch:
+  schedule:
+    - cron: '0 * * * *'  # Run every hour at minute 0
 
 jobs:
   scheduled-ping-agent:

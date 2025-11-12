@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cursor Cloud Agent REST API Status</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header>
+        <div class="header-content">
+            <div class="logo-container">
+                <h1>Cursor Cloud Agent REST API Status</h1>
+            </div>
+        </div>
+    </header>
+
+    <div class="container">
+        <div id="status-banner" class="status-banner">
+            <h2 id="status-text">Loading...</h2>
+            <div class="uptime-info" id="uptime-info"></div>
+        </div>
+
+        <div class="section">
+            <h3>Today's Status (24 hours)</h3>
+            <div class="daily-chart-container">
+                <canvas id="dailyChart"></canvas>
+            </div>
+        </div>
+
+        <!-- Temporarily removed 90-day chart
+        <div class="section">
+            <h3>Uptime over the past 90 days</h3>
+            <div class="chart-container">
+                <canvas id="historyChart"></canvas>
+            </div>
+            <div class="status-legend">
+                <div class="legend-item">
+                    <div class="legend-color green"></div>
+                    <span>Operational</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color yellow"></div>
+                    <span>Degraded Performance</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color red"></div>
+                    <span>Major Outage</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color grey"></div>
+                    <span>No data</span>
+                </div>
+            </div>
+        </div>
+        -->
+    </div>
+
+    <footer>
+        Powered by <a href="https://www.cursor.com/" target="_blank" rel="noopener noreferrer">Cursor</a> with ❤️ from <a href="https://www.google.com/maps/place/Community+of+Madrid,+Madrid/@40.4983324,-6.3162283,8z/data=!3m1!4b1!4m6!3m5!1s0xd41817a40e033b9:0x10340f3be4bc880!8m2!3d40.4167088!4d-3.5812692!16zL20vMGo0eGc?entry=ttu&g_ep=EgoyMDI1MDgxOC4wIKXMDSoASAFQAw%3D%3D" target="_blank" rel="noopener noreferrer">Madrid</a>
+    </footer>
+    <script src="script.js"></script>
+</body>
+</html>
