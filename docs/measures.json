@@ -38,5 +38,10 @@
     "localdatetime": "20251113 04:10",
     "status": "UP",
     "latency": 18
+  },
+  {
+    "localdatetime": "20251113 05:07",
+    "status": "UP",
+    "latency": 30
   }
 ]
