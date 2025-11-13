@@ -41,4 +41,4 @@ jobs:
           GITHUB_ACTIONS: true
         run: |
           chmod +x .github/scripts/execute-and-measure.sh
-          ./.github/scripts/execute-and-measure.sh
+          ./.github/scripts/execute-and-measure.sh churrera-recipes/hello-world-bash/workflow.xml

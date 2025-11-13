@@ -1,12 +1,27 @@
 #!/bin/bash
 set -e
 
+# Check if workflow file path is provided
+if [ -z "$1" ]; then
+    echo "Error: Workflow file path is required"
+    echo "Usage: $0 <workflow.xml>"
+    exit 1
+fi
+
+WORKFLOW_FILE="$1"
+
+# Validate that the workflow file exists
+if [ ! -f "$WORKFLOW_FILE" ]; then
+    echo "Error: Workflow file not found: $WORKFLOW_FILE"
+    exit 1
+fi
+
 # Capture start time
 START_TIME=$(date +%s)
 
 # Execute the churrera workflow
 jbang trust add https://github.com/jabrena/
-jbang churrera@jabrena run churrera-recipes/hello-world-bash/workflow.xml
+jbang churrera@jabrena run "$WORKFLOW_FILE"
 
 # Capture end time
 END_TIME=$(date +%s)
