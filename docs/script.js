@@ -2,14 +2,12 @@
 function getStatusColor(status, latency) {
     if (!status) return 'grey';
     if (status === 'DOWN') return 'red';
-    if (latency > 60) return 'yellow'; // > 1 minute
     return 'green';
 }
 
 function getStatusText(status, latency) {
     if (!status) return 'No data';
     if (status === 'DOWN') return 'Major Outage';
-    if (latency > 60) return 'Degraded Performance';
     return 'Operational';
 }
 
@@ -157,7 +155,7 @@ function calculateOverallUptime(measures) {
     
     let operational = 0;
     recentMeasures.forEach(m => {
-        if (m.status === 'UP' && m.latency <= 60) {
+        if (m.status === 'UP') {
             operational++;
         }
     });
@@ -169,10 +167,17 @@ function getCurrentStatus(measures) {
     if (measures.length === 0) {
         return { status: 'grey', text: 'No data available', uptime: 0 };
     }
+    const uptime = calculateOverallUptime(measures);
+    
+    // If uptime is 100%, show green/operational regardless of latest measure
+    if (uptime === 100) {
+        return { status: 'green', text: 'Operational', uptime, latest: measures[measures.length - 1] };
+    }
+    
+    // Otherwise, check the latest measure's status
     const latest = measures[measures.length - 1];
     const color = getStatusColor(latest.status, latest.latency);
     const text = getStatusText(latest.status, latest.latency);
-    const uptime = calculateOverallUptime(measures);
     return { status: color, text, uptime, latest };
 }
 
