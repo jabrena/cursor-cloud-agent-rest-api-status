@@ -495,11 +495,11 @@ function createLatencyChart(latencyData) {
                     beginAtZero: true,
                     title: {
                         display: true,
-                        text: 'Latency (ms)'
+                        text: 'Latency (sec)'
                     },
                     ticks: {
                         callback: function(value) {
-                            return value + ' ms';
+                            return value + ' sec';
                         }
                     }
                 },
@@ -522,7 +522,7 @@ function createLatencyChart(latencyData) {
                             if (value === null) {
                                 return context.dataset.label + ': No data';
                             }
-                            return context.dataset.label + ': ' + value.toFixed(2) + ' ms';
+                            return context.dataset.label + ': ' + value.toFixed(2) + ' sec';
                         }
                     }
                 }
