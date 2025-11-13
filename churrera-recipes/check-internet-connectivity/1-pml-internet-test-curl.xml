@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<prompt xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="https://jabrena.github.io/pml/schemas/0.3.0/pml.xsd">
+        
+    <goal>
+        Check internet connectivity using a curl command
+
+        ```bash
+        curl -L https://marca.com | grep "Marca"
+        ```
+    </goal>
+
+    <output-format>Not explain anything only show the output of the curl command</output-format>
+</prompt>

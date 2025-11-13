@@ -9,7 +9,7 @@ jobs:
   scheduled-ping-agent:
     name: Scheduled Ping Agent Execution
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 15
     permissions:
       contents: write
 
@@ -35,10 +35,29 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y jq
 
-      - name: Execute AOC Agent and Measure
+      - name: Execute Bash command
+        continue-on-error: true
         env:
           CURSOR_API_KEY: ${{ secrets.CURSOR_API_KEY }}
           GITHUB_ACTIONS: true
         run: |
           chmod +x .github/scripts/execute-and-measure.sh
           ./.github/scripts/execute-and-measure.sh churrera-recipes/hello-world-bash/workflow.xml
+
+      - name: Check Internet Connectivity
+        continue-on-error: true
+        env:
+          CURSOR_API_KEY: ${{ secrets.CURSOR_API_KEY }}
+          GITHUB_ACTIONS: true
+        run: |
+          chmod +x .github/scripts/execute-and-measure.sh
+          ./.github/scripts/execute-and-measure.sh churrera-recipes/check-internet-connectivity/workflow.xml
+
+      - name: Execute Java 25 Update Workflow
+        continue-on-error: true
+        env:
+          CURSOR_API_KEY: ${{ secrets.CURSOR_API_KEY }}
+          GITHUB_ACTIONS: true
+        run: |
+          chmod +x .github/scripts/execute-and-measure.sh
+          ./.github/scripts/execute-and-measure.sh churrera-recipes/java-25-update/workflow.xml
