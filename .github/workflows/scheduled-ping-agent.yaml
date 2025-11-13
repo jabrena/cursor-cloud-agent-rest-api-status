@@ -42,7 +42,7 @@ jobs:
           GITHUB_ACTIONS: true
         run: |
           chmod +x .github/scripts/execute-and-measure.sh
-          ./.github/scripts/execute-and-measure.sh churrera-recipes/hello-world-bash/workflow.xml
+          ./.github/scripts/execute-and-measure.sh churrera-recipes/hello-world-bash/workflow.xml "bash"
 
       - name: Check Internet Connectivity
         continue-on-error: true
@@ -51,7 +51,7 @@ jobs:
           GITHUB_ACTIONS: true
         run: |
           chmod +x .github/scripts/execute-and-measure.sh
-          ./.github/scripts/execute-and-measure.sh churrera-recipes/check-internet-connectivity/workflow.xml
+          ./.github/scripts/execute-and-measure.sh churrera-recipes/check-internet-connectivity/workflow.xml "curl io"
 
       - name: Execute Java 25 Update Workflow
         continue-on-error: true
@@ -60,4 +60,4 @@ jobs:
           GITHUB_ACTIONS: true
         run: |
           chmod +x .github/scripts/execute-and-measure.sh
-          ./.github/scripts/execute-and-measure.sh churrera-recipes/java-25-update/workflow.xml
+          ./.github/scripts/execute-and-measure.sh churrera-recipes/java-25-update/workflow.xml "debian package"

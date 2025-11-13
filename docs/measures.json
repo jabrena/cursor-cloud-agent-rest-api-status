@@ -2,136 +2,163 @@
   {
     "localdatetime": "20251112 20:50",
     "status": "UP",
-    "latency": 17
+    "latency": 17,
+    "test-type": "bash"
   },
   {
     "localdatetime": "20251112 22:07",
     "status": "UP",
-    "latency": 30
+    "latency": 30,
+    "test-type": "bash"
   },
   {
     "localdatetime": "20251112 23:06",
     "status": "UP",
-    "latency": 30
+    "latency": 30,
+    "test-type": "bash"
   },
   {
     "localdatetime": "20251113 00:25",
     "status": "UP",
-    "latency": 20
+    "latency": 20,
+    "test-type": "bash"
   },
   {
     "localdatetime": "20251113 01:35",
     "status": "UP",
-    "latency": 19
+    "latency": 19,
+    "test-type": "bash"
   },
   {
     "localdatetime": "20251113 02:38",
     "status": "UP",
-    "latency": 18
+    "latency": 18,
+    "test-type": "bash"
   },
   {
     "localdatetime": "20251113 03:27",
     "status": "UP",
-    "latency": 30
+    "latency": 30,
+    "test-type": "bash"
   },
   {
     "localdatetime": "20251113 04:10",
     "status": "UP",
-    "latency": 18
+    "latency": 18,
+    "test-type": "bash"
   },
   {
     "localdatetime": "20251113 05:07",
     "status": "UP",
-    "latency": 30
+    "latency": 30,
+    "test-type": "bash"
   },
   {
     "localdatetime": "20251113 06:09",
     "status": "UP",
-    "latency": 20
+    "latency": 20,
+    "test-type": "bash"
   },
   {
     "localdatetime": "20251113 07:07",
     "status": "UP",
-    "latency": 29
+    "latency": 29,
+    "test-type": "bash"
   },
   {
     "localdatetime": "20251113 08:09",
     "status": "UP",
-    "latency": 51
+    "latency": 51,
+    "test-type": "bash"
   },
   {
     "localdatetime": "20251113 09:57",
     "status": "UP",
-    "latency": 40
+    "latency": 40,
+    "test-type": "bash"
   },
   {
     "localdatetime": "20251113 09:58",
     "status": "UP",
-    "latency": 37
+    "latency": 37,
+    "test-type": "curl io"
   },
   {
     "localdatetime": "20251113 09:59",
     "status": "UP",
-    "latency": 90
+    "latency": 90,
+    "test-type": "debian package"
   },
   {
     "localdatetime": "20251113 10:08",
     "status": "UP",
-    "latency": 29
+    "latency": 29,
+    "test-type": "bash"
   },
   {
     "localdatetime": "20251113 10:08",
     "status": "UP",
-    "latency": 27
+    "latency": 27,
+    "test-type": "curl io"
   },
   {
     "localdatetime": "20251113 10:10",
     "status": "UP",
-    "latency": 89
+    "latency": 89,
+    "test-type": "debian package"
   },
   {
     "localdatetime": "20251113 11:06",
     "status": "UP",
-    "latency": 30
+    "latency": 30,
+    "test-type": "bash"
   },
   {
     "localdatetime": "20251113 11:07",
     "status": "UP",
-    "latency": 59
+    "latency": 59,
+    "test-type": "curl io"
   },
   {
     "localdatetime": "20251113 11:09",
     "status": "UP",
-    "latency": 80
+    "latency": 80,
+    "test-type": "debian package"
   },
   {
     "localdatetime": "20251113 12:11",
     "status": "UP",
-    "latency": 29
+    "latency": 29,
+    "test-type": "bash"
   },
   {
     "localdatetime": "20251113 12:11",
     "status": "UP",
-    "latency": 36
+    "latency": 36,
+    "test-type": "curl io"
   },
   {
     "localdatetime": "20251113 12:13",
     "status": "UP",
-    "latency": 89
+    "latency": 89,
+    "test-type": "debian package"
   },
   {
     "localdatetime": "20251113 13:17",
     "status": "UP",
-    "latency": 40
+    "latency": 40,
+    "test-type": "bash"
   },
   {
     "localdatetime": "20251113 13:17",
     "status": "UP",
-    "latency": 37
+    "latency": 37,
+    "test-type": "curl io"
   },
   {
     "localdatetime": "20251113 13:19",
     "status": "UP",
-    "latency": 90
+    "latency": 90,
+    "test-type": "debian package"
   }
 ]

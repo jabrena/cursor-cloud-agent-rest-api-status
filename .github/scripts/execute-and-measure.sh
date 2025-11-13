@@ -4,11 +4,12 @@ set -e
 # Check if workflow file path is provided
 if [ -z "$1" ]; then
     echo "Error: Workflow file path is required"
-    echo "Usage: $0 <workflow.xml>"
+    echo "Usage: $0 <workflow.xml> [test-type]"
     exit 1
 fi
 
 WORKFLOW_FILE="$1"
+TEST_TYPE="$2"  # Optional second parameter for test-type
 
 # Validate that the workflow file exists
 if [ ! -f "$WORKFLOW_FILE" ]; then
@@ -54,14 +55,31 @@ MEASURES_FILE="docs/measures.json"
 # Check if file exists and has content
 if [ -f "$MEASURES_FILE" ] && [ -s "$MEASURES_FILE" ]; then
     # Use jq to add new entry to the array
-    jq --arg datetime "$LOCAL_DATETIME" \
-       --arg status "$STATUS" \
-       --argjson latency $DURATION \
-       '. += [{"localdatetime": $datetime, "status": $status, "latency": $latency}]' \
-       "$MEASURES_FILE" > "$MEASURES_FILE.tmp" && mv "$MEASURES_FILE.tmp" "$MEASURES_FILE"
+    if [ -n "$TEST_TYPE" ]; then
+        # Include test-type if provided
+        jq --arg datetime "$LOCAL_DATETIME" \
+           --arg status "$STATUS" \
+           --argjson latency $DURATION \
+           --arg testtype "$TEST_TYPE" \
+           '. += [{"localdatetime": $datetime, "status": $status, "latency": $latency, "test-type": $testtype}]' \
+           "$MEASURES_FILE" > "$MEASURES_FILE.tmp" && mv "$MEASURES_FILE.tmp" "$MEASURES_FILE"
+    else
+        # No test-type provided
+        jq --arg datetime "$LOCAL_DATETIME" \
+           --arg status "$STATUS" \
+           --argjson latency $DURATION \
+           '. += [{"localdatetime": $datetime, "status": $status, "latency": $latency}]' \
+           "$MEASURES_FILE" > "$MEASURES_FILE.tmp" && mv "$MEASURES_FILE.tmp" "$MEASURES_FILE"
+    fi
 else
     # Create new file with single entry
-    echo "[{\"localdatetime\": \"$LOCAL_DATETIME\", \"status\": \"$STATUS\", \"latency\": $DURATION}]" > "$MEASURES_FILE"
+    if [ -n "$TEST_TYPE" ]; then
+        # Include test-type if provided
+        echo "[{\"localdatetime\": \"$LOCAL_DATETIME\", \"status\": \"$STATUS\", \"latency\": $DURATION, \"test-type\": \"$TEST_TYPE\"}]" > "$MEASURES_FILE"
+    else
+        # No test-type provided
+        echo "[{\"localdatetime\": \"$LOCAL_DATETIME\", \"status\": \"$STATUS\", \"latency\": $DURATION}]" > "$MEASURES_FILE"
+    fi
 fi
 
 echo "Execution completed: Duration=${DURATION}s, Status=${STATUS}"

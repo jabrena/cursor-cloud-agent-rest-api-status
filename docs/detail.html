@@ -177,6 +177,7 @@
                             <tr>
                                 <th>Time</th>
                                 <th>Status</th>
+                                <th>Test Type</th>
                                 <th>Latency (ms)</th>
                             </tr>
                         </thead>
@@ -184,6 +185,7 @@
                 `;
 
                 hourMeasures.forEach(measure => {
+                    const testType = measure['test-type'] || '-';
                     tableHTML += `
                         <tr>
                             <td>${formatDateTime(measure.localdatetime)}</td>
@@ -192,6 +194,7 @@
                                     ${measure.status}
                                 </span>
                             </td>
+                            <td>${testType}</td>
                             <td class="latency-cell">
                                 ${measure.latency} ms
                             </td>
