@@ -39,6 +39,15 @@ fi
 # Get current date and time in format YYYYMMDD HH:MM
 LOCAL_DATETIME=$(date +"%Y%m%d %H:%M")
 
+# Fetch and pull latest changes before reading measures.json to avoid conflicts
+# when running multiple times in sequence
+if [ -n "$GITHUB_ACTIONS" ]; then
+    git config --local user.email "action@github.com"
+    git config --local user.name "GitHub Action"
+    git fetch origin main
+    git pull origin main --no-edit || echo "Pull failed or no changes to merge"
+fi
+
 # Read existing measures.json and add new entry
 MEASURES_FILE="docs/measures.json"
 
@@ -59,8 +68,6 @@ echo "Execution completed: Duration=${DURATION}s, Status=${STATUS}"
 
 # Commit and push measures.json if running in CI environment
 if [ -n "$GITHUB_ACTIONS" ]; then
-    git config --local user.email "action@github.com"
-    git config --local user.name "GitHub Action"
     git add "$MEASURES_FILE"
     if git diff --staged --quiet; then
         echo "No changes to commit"
