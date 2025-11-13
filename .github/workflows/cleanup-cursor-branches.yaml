@@ -12,6 +12,7 @@ jobs:
     timeout-minutes: 10
     permissions:
       contents: write
+      pull-requests: write
 
     steps:
       - name: Checkout repository
@@ -35,16 +36,47 @@ jobs:
           
           if [ -z "$BRANCHES" ]; then
             echo "No branches starting with 'cursor/' found to delete."
+          else
+            echo "Found branches to delete: $BRANCHES"
+            
+            # Delete each branch remotely
+            for branch in $BRANCHES; do
+              echo "Deleting branch: $branch"
+              git push origin --delete "$branch" || echo "Failed to delete $branch (may not exist)"
+            done
+          fi
+          
+          echo "Branch cleanup completed."
+
+      - name: Close PRs with commits from cursoragent
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          # Get all open PRs
+          PR_COUNT=$(gh pr list --state open --json number --jq 'length')
+          
+          if [ "$PR_COUNT" -eq 0 ]; then
+            echo "No open PRs found."
             exit 0
           fi
           
-          echo "Found branches to delete: $BRANCHES"
+          echo "Found $PR_COUNT open PR(s). Checking for commits from cursoragent..."
           
-          # Delete each branch remotely
-          for branch in $BRANCHES; do
-            echo "Deleting branch: $branch"
-            git push origin --delete "$branch" || echo "Failed to delete $branch (may not exist)"
+          # Get PR numbers and process each one
+          gh pr list --state open --json number,headRefName --jq '.[] | "\(.number)|\(.headRefName)"' | while IFS='|' read -r pr_number branch_name; do
+            echo "Checking PR #$pr_number (branch: $branch_name)"
+            
+            # Get commits for this PR and check if any author is cursoragent
+            COMMITS=$(gh pr view "$pr_number" --json commits --jq '.commits[] | select(.author.login == "cursoragent" or .author.name == "cursoragent") | .oid')
+            
+            if [ -n "$COMMITS" ]; then
+              echo "PR #$pr_number has commits from cursoragent. Closing PR..."
+              gh pr close "$pr_number" --comment "This PR has been automatically closed because it contains commits from cursoragent."
+              echo "Closed PR #$pr_number"
+            else
+              echo "PR #$pr_number does not have commits from cursoragent. Skipping."
+            fi
           done
           
-          echo "Cleanup completed successfully."
+          echo "PR cleanup completed successfully."
 
