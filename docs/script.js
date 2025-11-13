@@ -85,6 +85,90 @@ function aggregateByDay(measures) {
     return result;
 }
 
+// Aggregate latency data by hour and test-type for latency chart
+function aggregateLatencyByHourAndType(measures) {
+    const now = new Date();
+    
+    // Create a map to store hourly data for the last 24 hours
+    const hourlyData = {};
+    
+    // Initialize 24 hours (from 24 hours ago to current hour)
+    for (let i = 0; i < 24; i++) {
+        const hoursBack = 23 - i; // 23, 22, ..., 1, 0
+        const slotDate = new Date(now);
+        slotDate.setHours(now.getHours() - hoursBack, 0, 0, 0);
+        
+        const hourKey = slotDate.toISOString().slice(0, 13); // YYYY-MM-DDTHH format
+        hourlyData[hourKey] = { 
+            measures: [], 
+            hour: slotDate.getHours(),
+            date: new Date(slotDate)
+        };
+    }
+
+    // Add measures to their respective hours
+    measures.forEach(measure => {
+        const measureDate = parseDateTime(measure.localdatetime);
+        const hourKey = measureDate.toISOString().slice(0, 13); // YYYY-MM-DDTHH format
+        
+        if (hourlyData[hourKey]) {
+            hourlyData[hourKey].measures.push(measure);
+        }
+    });
+
+    // Get all unique test-types
+    const testTypes = new Set();
+    measures.forEach(measure => {
+        if (measure['test-type']) {
+            testTypes.add(measure['test-type']);
+        }
+    });
+
+    // Build result structure: for each hour, calculate average latency per test-type
+    const result = {
+        hours: [],
+        testTypes: Array.from(testTypes),
+        data: {}
+    };
+
+    // Initialize data structure for each test-type
+    result.testTypes.forEach(testType => {
+        result.data[testType] = [];
+    });
+
+    // Process each hour
+    for (let i = 0; i < 24; i++) {
+        const hoursBack = 23 - i; // 23, 22, ..., 1, 0
+        const slotDate = new Date(now);
+        slotDate.setHours(now.getHours() - hoursBack, 0, 0, 0);
+        
+        const hourKey = slotDate.toISOString().slice(0, 13);
+        const hourData = hourlyData[hourKey] || { 
+            measures: [], 
+            hour: slotDate.getHours(), 
+            date: new Date(slotDate) 
+        };
+        
+        result.hours.push({
+            hour: hourData.hour,
+            date: hourData.date
+        });
+
+        // Calculate average latency for each test-type in this hour
+        result.testTypes.forEach(testType => {
+            const typeMeasures = hourData.measures.filter(m => m['test-type'] === testType && m.status === 'UP');
+            if (typeMeasures.length > 0) {
+                const avgLatency = typeMeasures.reduce((sum, m) => sum + m.latency, 0) / typeMeasures.length;
+                result.data[testType].push(avgLatency);
+            } else {
+                result.data[testType].push(null); // No data for this hour/test-type combination
+            }
+        });
+    }
+
+    return result;
+}
+
 // Aggregate data by hour for daily chart (rolling 24 hours)
 function aggregateByHour(measures) {
     const now = new Date();
@@ -363,6 +447,92 @@ function createDailyChart(hourlyData) {
     return chart;
 }
 
+// Create latency chart by test-type
+function createLatencyChart(latencyData) {
+    const ctx = document.getElementById('latencyChart').getContext('2d');
+    const labels = latencyData.hours.map(h => {
+        const hour = h.hour;
+        return hour.toString().padStart(2, '0') + ':00';
+    });
+    
+    // Define colors for each test-type
+    const colors = {
+        'bash': '#47b881',
+        'curl io': '#3498db',
+        'debian package': '#e74c3c',
+        // Add more colors for additional test-types if needed
+        'default': '#9b59b6'
+    };
+    
+    // Create datasets for each test-type
+    const datasets = latencyData.testTypes.map(testType => {
+        const color = colors[testType] || colors['default'];
+        return {
+            label: testType,
+            data: latencyData.data[testType],
+            borderColor: color,
+            backgroundColor: color + '20', // Add transparency
+            borderWidth: 2,
+            fill: false,
+            tension: 0.1, // Smooth curves
+            pointRadius: 3,
+            pointHoverRadius: 5,
+            spanGaps: true // Connect points even when there's missing data
+        };
+    });
+
+    const chart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: labels,
+            datasets: datasets
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    title: {
+                        display: true,
+                        text: 'Latency (ms)'
+                    },
+                    ticks: {
+                        callback: function(value) {
+                            return value + ' ms';
+                        }
+                    }
+                },
+                x: {
+                    title: {
+                        display: true,
+                        text: 'Hour'
+                    }
+                }
+            },
+            plugins: {
+                legend: {
+                    display: true,
+                    position: 'top'
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            const value = context.parsed.y;
+                            if (value === null) {
+                                return context.dataset.label + ': No data';
+                            }
+                            return context.dataset.label + ': ' + value.toFixed(2) + ' ms';
+                        }
+                    }
+                }
+            }
+        }
+    });
+    
+    return chart;
+}
+
 // Load and process data
 async function loadData() {
     try {
@@ -391,14 +561,17 @@ async function loadData() {
         // Filter measures from last 24 hours
         const now = new Date();
         const last24Hours = new Date(now.getTime() - 24 * 60 * 60 * 1000);
-        const hourlyData = aggregateByHour(measures.filter(m => {
+        const recentMeasures = measures.filter(m => {
             const date = parseDateTime(m.localdatetime);
             return date >= last24Hours;
-        }));
+        });
+        const hourlyData = aggregateByHour(recentMeasures);
+        const latencyData = aggregateLatencyByHourAndType(recentMeasures);
 
         // Create charts
         // createHistoryChart(dailyData); // Temporarily disabled - chart removed
         createDailyChart(hourlyData);
+        createLatencyChart(latencyData);
     } catch (error) {
         console.error('Error loading data:', error);
         document.getElementById('status-text').textContent = 'Error loading data';
