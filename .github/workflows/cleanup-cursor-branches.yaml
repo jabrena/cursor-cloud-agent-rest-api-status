@@ -1,0 +1,50 @@
+name: Cleanup Cursor Branches
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 0 * * *'  # Run every day at midnight UTC
+
+jobs:
+  cleanup-cursor-branches:
+    name: Cleanup Cursor Branches
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+        with:
+          fetch-depth: 0  # Fetch all branches
+
+      - name: Configure Git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Fetch all branches
+        run: |
+          git fetch --all --prune
+
+      - name: List and delete cursor/ branches
+        run: |
+          # Get all branches starting with cursor/
+          BRANCHES=$(git branch -r | grep -E 'origin/cursor/' | sed 's/origin\///' | tr '\n' ' ')
+          
+          if [ -z "$BRANCHES" ]; then
+            echo "No branches starting with 'cursor/' found to delete."
+            exit 0
+          fi
+          
+          echo "Found branches to delete: $BRANCHES"
+          
+          # Delete each branch remotely
+          for branch in $BRANCHES; do
+            echo "Deleting branch: $branch"
+            git push origin --delete "$branch" || echo "Failed to delete $branch (may not exist)"
+          done
+          
+          echo "Cleanup completed successfully."
+
