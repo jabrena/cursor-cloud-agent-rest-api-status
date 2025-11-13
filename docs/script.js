@@ -85,30 +85,55 @@ function aggregateByDay(measures) {
     return result;
 }
 
-// Aggregate data by hour for daily chart
+// Aggregate data by hour for daily chart (rolling 24 hours)
 function aggregateByHour(measures) {
-    const hourlyData = {};
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
+    const now = new Date();
+    const currentHour = now.getHours();
     
-    // Initialize 24 hours
+    // Create a map to store hourly data for the last 24 hours
+    const hourlyData = {};
+    
+    // Initialize 24 hours (from 24 hours ago to current hour)
+    // Going back from current hour: currentHour-23, currentHour-22, ..., currentHour-1, currentHour
     for (let i = 0; i < 24; i++) {
-        hourlyData[i] = { measures: [], status: 'grey' };
+        const hoursBack = 23 - i; // 23, 22, ..., 1, 0
+        const slotDate = new Date(now);
+        slotDate.setHours(now.getHours() - hoursBack, 0, 0, 0);
+        
+        const hourKey = slotDate.toISOString().slice(0, 13); // YYYY-MM-DDTHH format
+        hourlyData[hourKey] = { 
+            measures: [], 
+            status: 'grey',
+            hour: slotDate.getHours(),
+            date: new Date(slotDate)
+        };
     }
 
     // Add measures to their respective hours
     measures.forEach(measure => {
-        const date = parseDateTime(measure.localdatetime);
-        const hour = date.getHours();
-        if (hourlyData[hour] !== undefined) {
-            hourlyData[hour].measures.push(measure);
+        const measureDate = parseDateTime(measure.localdatetime);
+        const hourKey = measureDate.toISOString().slice(0, 13); // YYYY-MM-DDTHH format
+        
+        if (hourlyData[hourKey]) {
+            hourlyData[hourKey].measures.push(measure);
         }
     });
 
-    // Determine status for each hour
+    // Build result array ordered from oldest (left) to newest (right)
     const result = [];
     for (let i = 0; i < 24; i++) {
-        const hourData = hourlyData[i];
+        const hoursBack = 23 - i; // 23, 22, ..., 1, 0
+        const slotDate = new Date(now);
+        slotDate.setHours(now.getHours() - hoursBack, 0, 0, 0);
+        
+        const hourKey = slotDate.toISOString().slice(0, 13);
+        const hourData = hourlyData[hourKey] || { 
+            measures: [], 
+            status: 'grey', 
+            hour: slotDate.getHours(), 
+            date: new Date(slotDate) 
+        };
+        
         let status = 'grey';
         
         if (hourData.measures.length > 0) {
@@ -130,9 +155,10 @@ function aggregateByHour(measures) {
         }
         
         result.push({
-            hour: i,
+            hour: hourData.hour,
             status: status,
-            count: hourData.measures.length
+            count: hourData.measures.length,
+            date: hourData.date
         });
     }
 
@@ -362,11 +388,12 @@ async function loadData() {
 
         // Aggregate data
         const dailyData = aggregateByDay(measures);
+        // Filter measures from last 24 hours
+        const now = new Date();
+        const last24Hours = new Date(now.getTime() - 24 * 60 * 60 * 1000);
         const hourlyData = aggregateByHour(measures.filter(m => {
             const date = parseDateTime(m.localdatetime);
-            const today = new Date();
-            today.setHours(0, 0, 0, 0);
-            return date >= today;
+            return date >= last24Hours;
         }));
 
         // Create charts

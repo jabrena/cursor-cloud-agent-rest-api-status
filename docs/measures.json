@@ -1,11 +1,5 @@
 [
   {
-    "localdatetime": "20251112 20:50",
-    "status": "UP",
-    "latency": 17,
-    "test-type": "bash"
-  },
-  {
     "localdatetime": "20251112 22:07",
     "status": "UP",
     "latency": 30,
