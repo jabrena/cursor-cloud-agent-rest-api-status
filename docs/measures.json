@@ -202,5 +202,11 @@
     "status": "UP",
     "latency": 155,
     "test-type": "java hello world"
+  },
+  {
+    "localdatetime": "20251113 16:08",
+    "status": "UP",
+    "latency": 29,
+    "test-type": "bash"
   }
 ]
