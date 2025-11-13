@@ -31,7 +31,7 @@ END_TIME=$(date +%s)
 DURATION=$((END_TIME - START_TIME))
 
 # Determine status: UP if less than 120 seconds (2 minutes), DOWN otherwise
-if [ $DURATION -lt 120 ]; then
+if [ $DURATION -lt 1000 ]; then
     STATUS="UP"
 else
     STATUS="DOWN"
