@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<prompt>
+    <title>Develop a HelloWorld Java Class program</title>
+
+    <role>You are a Senior software engineer with extensive experience in Java software development</role>
+
+    <goal>Develop a classic Java class HelloWorld.java program
+        that print "Hello World" in the console only</goal>
+
+    <constraints>
+        <constraint-list>
+            <constraint>Develop the class in the Maven module `sandbox`</constraint>
+            <constraint>Develop the class in the package info.jab.examples</constraint>
+            <constraint>Don't invest time in planning</constraint>
+            <constraint>Don't create any test class</constraint>
+            <constraint>Don't touch the build file (pom.xml)</constraint>
+        </constraint-list>
+    </constraints>
+
+    <output-format>Don't explain anything</output-format>
+
+    <safeguards>Build the solution with Maven Only</safeguards>
+
+    <acceptance-criteria>
+        <acceptance-criteria-list>
+            <acceptance-criteria-item>The solution is compiled successfully with `./mvnw clean compile -pl sandbox`</acceptance-criteria-item>
+            <acceptance-criteria-item>The solution only prints "Hello World" in the console</acceptance-criteria-item>
+            <acceptance-criteria-item>The solution is committed and pushed to the branch to create the PR</acceptance-criteria-item>
+            <acceptance-criteria-item>Only commit java sources only and push the changes to the branch to create the PR</acceptance-criteria-item>
+        </acceptance-criteria-list>
+    </acceptance-criteria>
+</prompt>

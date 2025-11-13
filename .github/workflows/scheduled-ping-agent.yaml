@@ -61,3 +61,12 @@ jobs:
         run: |
           chmod +x .github/scripts/execute-and-measure.sh
           ./.github/scripts/execute-and-measure.sh churrera-recipes/java-25-update/workflow.xml "debian package"
+
+      - name: Execute Hello World Java Workflow
+        continue-on-error: true
+        env:
+          CURSOR_API_KEY: ${{ secrets.CURSOR_API_KEY }}
+          GITHUB_ACTIONS: true
+        run: |
+          chmod +x .github/scripts/execute-and-measure.sh
+          ./.github/scripts/execute-and-measure.sh churrera-recipes/hello-world-java/workflow.xml "java hello world"
