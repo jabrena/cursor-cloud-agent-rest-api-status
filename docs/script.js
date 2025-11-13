@@ -114,15 +114,21 @@ function aggregateByHour(measures) {
         let status = 'grey';
         
         if (hourData.measures.length > 0) {
-            let hasDown = false;
-            let hasDegraded = false;
-            hourData.measures.forEach(m => {
-                if (m.status === 'DOWN') hasDown = true;
-                else if (m.latency > 60) hasDegraded = true;
-            });
-            if (hasDown) status = 'red';
-            else if (hasDegraded) status = 'yellow';
-            else status = 'green';
+            // Determine status for the hour based on DOWN status only
+            // Count measures that are not UP (i.e., DOWN)
+            const downCount = hourData.measures.filter(m => m.status !== 'UP').length;
+            const halfThreshold = hourData.measures.length / 2;
+            
+            if (downCount > halfThreshold) {
+                // More than half are DOWN -> DOWN status
+                status = 'red';
+            } else if (downCount > 0) {
+                // At least one is DOWN but not more than half -> DEGRADED
+                status = 'yellow';
+            } else {
+                // All are UP -> OPERATIONAL
+                status = 'green';
+            }
         }
         
         result.push({
@@ -258,7 +264,7 @@ function createDailyChart(hourlyData) {
         return '#ccc';
     });
 
-    return new Chart(ctx, {
+    const chart = new Chart(ctx, {
         type: 'bar',
         data: {
             labels: labels,
@@ -305,9 +311,25 @@ function createDailyChart(hourlyData) {
                         }
                     }
                 }
+            },
+            onClick: (event, elements) => {
+                if (elements.length > 0) {
+                    const clickedIndex = elements[0].index;
+                    const hour = hourlyData[clickedIndex].hour;
+                    if (hourlyData[clickedIndex].count > 0) {
+                        window.location.href = `detail.html?hour=${hour}`;
+                    }
+                }
+            },
+            onHover: (event, elements) => {
+                event.native.target.style.cursor = elements.length > 0 && hourlyData[elements[0].index].count > 0 
+                    ? 'pointer' 
+                    : 'default';
             }
         }
     });
+    
+    return chart;
 }
 
 // Load and process data

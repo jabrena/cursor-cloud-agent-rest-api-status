@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hour Details - Cursor Cloud Agent REST API Status</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .measures-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        
+        .measures-table th,
+        .measures-table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        
+        .measures-table th {
+            background-color: #f8f8f8;
+            font-weight: 600;
+            color: #333;
+        }
+        
+        .measures-table tr:hover {
+            background-color: #f8f8f8;
+        }
+        
+        .status-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 4px;
+            font-size: 14px;
+            font-weight: 500;
+        }
+        
+        .status-badge.up {
+            background-color: #47b881;
+            color: #fff;
+        }
+        
+        .status-badge.down {
+            background-color: #d04437;
+            color: #fff;
+        }
+        
+        .latency-cell {
+            font-weight: 500;
+        }
+        
+        .back-link {
+            display: inline-block;
+            margin-bottom: 20px;
+            color: #333;
+            text-decoration: none;
+            font-weight: 500;
+        }
+        
+        .back-link:hover {
+            color: #47b881;
+        }
+        
+        .hour-header {
+            margin-bottom: 10px;
+        }
+        
+        .no-data {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="header-content">
+            <div class="logo-container">
+                <h1>Cursor Cloud Agent REST API Status</h1>
+            </div>
+        </div>
+    </header>
+
+    <div class="container">
+        <a href="index.html" class="back-link">← Back to Status Dashboard</a>
+        
+        <div class="section">
+            <h3 class="hour-header" id="hour-header">Loading...</h3>
+            <div id="measures-container"></div>
+        </div>
+    </div>
+
+    <footer>
+        Powered by <a href="https://www.cursor.com/" target="_blank" rel="noopener noreferrer">Cursor</a> with ❤️ from <a href="https://www.google.com/maps/place/Community+of+Madrid,+Madrid/@40.4983324,-6.3162283,8z/data=!3m1!4b1!4m6!3m5!1s0xd41817a40e033b9:0x10340f3be4bc880!8m2!3d40.4167088!4d-3.5812692!16zL20vMGo0eGc?entry=ttu&g_ep=EgoyMDI1MDgxOC4wIKXMDSoASAFQAw%3D%3D" target="_blank" rel="noopener noreferrer">Madrid</a>
+    </footer>
+
+    <script>
+        // Parse datetime from format "YYYYMMDD HH:MM"
+        function parseDateTime(dateTimeStr) {
+            const [dateStr, timeStr] = dateTimeStr.split(' ');
+            const year = dateStr.substring(0, 4);
+            const month = dateStr.substring(4, 6);
+            const day = dateStr.substring(6, 8);
+            const [hour, minute] = timeStr.split(':');
+            return new Date(year, month - 1, day, hour, minute);
+        }
+
+        // Format datetime for display
+        function formatDateTime(dateTimeStr) {
+            const date = parseDateTime(dateTimeStr);
+            return date.toLocaleString('en-US', {
+                year: 'numeric',
+                month: '2-digit',
+                day: '2-digit',
+                hour: '2-digit',
+                minute: '2-digit',
+                hour12: false
+            });
+        }
+
+        // Load and display measures for the specified hour
+        async function loadHourMeasures() {
+            try {
+                // Get hour from URL parameters
+                const urlParams = new URLSearchParams(window.location.search);
+                const hour = parseInt(urlParams.get('hour'));
+                
+                if (isNaN(hour) || hour < 0 || hour > 23) {
+                    document.getElementById('hour-header').textContent = 'Invalid hour parameter';
+                    document.getElementById('measures-container').innerHTML = 
+                        '<div class="no-data">Please provide a valid hour (0-23) in the URL.</div>';
+                    return;
+                }
+
+                // Update header
+                const hourFormatted = hour.toString().padStart(2, '0') + ':00';
+                document.getElementById('hour-header').textContent = `Measures for ${hourFormatted}`;
+
+                // Load measures
+                const response = await fetch('measures.json');
+                const allMeasures = await response.json();
+
+                // Filter measures for the specified hour
+                const today = new Date();
+                today.setHours(0, 0, 0, 0);
+                
+                const hourMeasures = allMeasures.filter(measure => {
+                    const measureDate = parseDateTime(measure.localdatetime);
+                    return measureDate >= today && measureDate.getHours() === hour;
+                });
+
+                // Sort by datetime (oldest first)
+                hourMeasures.sort((a, b) => {
+                    const dateA = parseDateTime(a.localdatetime);
+                    const dateB = parseDateTime(b.localdatetime);
+                    return dateA - dateB;
+                });
+
+                // Display measures
+                const container = document.getElementById('measures-container');
+                
+                if (hourMeasures.length === 0) {
+                    container.innerHTML = `<div class="no-data">No measures found for ${hourFormatted}</div>`;
+                    return;
+                }
+
+                // Update header with count
+                document.getElementById('hour-header').textContent = 
+                    `Measures for ${hourFormatted} (${hourMeasures.length} measure${hourMeasures.length !== 1 ? 's' : ''})`;
+
+                // Create table
+                let tableHTML = `
+                    <table class="measures-table">
+                        <thead>
+                            <tr>
+                                <th>Time</th>
+                                <th>Status</th>
+                                <th>Latency (ms)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                `;
+
+                hourMeasures.forEach(measure => {
+                    tableHTML += `
+                        <tr>
+                            <td>${formatDateTime(measure.localdatetime)}</td>
+                            <td>
+                                <span class="status-badge ${measure.status.toLowerCase()}">
+                                    ${measure.status}
+                                </span>
+                            </td>
+                            <td class="latency-cell">
+                                ${measure.latency} ms
+                            </td>
+                        </tr>
+                    `;
+                });
+
+                tableHTML += `
+                        </tbody>
+                    </table>
+                `;
+
+                container.innerHTML = tableHTML;
+            } catch (error) {
+                console.error('Error loading data:', error);
+                document.getElementById('hour-header').textContent = 'Error loading data';
+                document.getElementById('measures-container').innerHTML = 
+                    '<div class="no-data">An error occurred while loading the measures.</div>';
+            }
+        }
+
+        // Load data when page loads
+        loadHourMeasures();
+    </script>
+</body>
+</html>
+
