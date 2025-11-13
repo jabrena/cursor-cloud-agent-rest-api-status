@@ -9,7 +9,7 @@ jobs:
   scheduled-ping-agent:
     name: Scheduled Ping Agent Execution
     runs-on: ubuntu-latest
-    timeout-minutes: 5
+    timeout-minutes: 10
     permissions:
       contents: write
 
@@ -38,18 +38,7 @@ jobs:
       - name: Execute AOC Agent and Measure
         env:
           CURSOR_API_KEY: ${{ secrets.CURSOR_API_KEY }}
+          GITHUB_ACTIONS: true
         run: |
           chmod +x .github/scripts/execute-and-measure.sh
           ./.github/scripts/execute-and-measure.sh
-
-      - name: Commit and push measures.json
-        run: |
-          git config --local user.email "action@github.com"
-          git config --local user.name "GitHub Action"
-          git add docs/measures.json
-          if git diff --staged --quiet; then
-            echo "No changes to commit"
-          else
-            git commit -m "Update measures.json with execution metrics [skip ci]"
-            git push origin main
-          fi

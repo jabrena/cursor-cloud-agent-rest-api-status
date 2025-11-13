@@ -42,3 +42,15 @@ fi
 
 echo "Execution completed: Duration=${DURATION}s, Status=${STATUS}"
 
+# Commit and push measures.json if running in CI environment
+if [ -n "$GITHUB_ACTIONS" ]; then
+    git config --local user.email "action@github.com"
+    git config --local user.name "GitHub Action"
+    git add "$MEASURES_FILE"
+    if git diff --staged --quiet; then
+        echo "No changes to commit"
+    else
+        git commit -m "Update measures.json with execution metrics [skip ci]"
+        git push origin main
+    fi
+fi
