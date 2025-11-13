@@ -131,6 +131,11 @@ header {
     height: 200px;
 }
 
+.latency-chart-container {
+    position: relative;
+    height: 400px;
+}
+
 .status-legend {
     display: flex;
     gap: 30px;
