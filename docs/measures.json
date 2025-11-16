@@ -2008,5 +2008,11 @@
     "status": "UP",
     "latency": 60,
     "test-type": "java hello world"
+  },
+  {
+    "localdatetime": "20251116 20:07",
+    "status": "UP",
+    "latency": 31,
+    "test-type": "bash"
   }
 ]
