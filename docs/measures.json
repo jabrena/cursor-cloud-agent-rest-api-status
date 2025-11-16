@@ -2020,5 +2020,11 @@
     "status": "UP",
     "latency": 38,
     "test-type": "curl io"
+  },
+  {
+    "localdatetime": "20251116 20:09",
+    "status": "UP",
+    "latency": 81,
+    "test-type": "debian package"
   }
 ]
