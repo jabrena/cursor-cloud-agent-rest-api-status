@@ -97,14 +97,15 @@
     </footer>
 
     <script>
-        // Parse datetime from format "YYYYMMDD HH:MM"
+        // Parse datetime from format "YYYYMMDD HH:MM" (treating as UTC)
         function parseDateTime(dateTimeStr) {
             const [dateStr, timeStr] = dateTimeStr.split(' ');
             const year = dateStr.substring(0, 4);
             const month = dateStr.substring(4, 6);
             const day = dateStr.substring(6, 8);
             const [hour, minute] = timeStr.split(':');
-            return new Date(year, month - 1, day, hour, minute);
+            // Parse as UTC since the data format represents UTC time
+            return new Date(Date.UTC(year, month - 1, day, hour, minute));
         }
 
         // Format datetime for display
@@ -142,13 +143,14 @@
                 const response = await fetch('measures.json');
                 const allMeasures = await response.json();
 
-                // Filter measures for the specified hour
-                const today = new Date();
-                today.setHours(0, 0, 0, 0);
+                // Filter measures for the specified hour from the last 24 hours (UTC)
+                const now = new Date();
+                const last24Hours = new Date(now.getTime() - 24 * 60 * 60 * 1000);
                 
                 const hourMeasures = allMeasures.filter(measure => {
                     const measureDate = parseDateTime(measure.localdatetime);
-                    return measureDate >= today && measureDate.getHours() === hour;
+                    // Check if measure is within last 24 hours and matches the UTC hour
+                    return measureDate >= last24Hours && measureDate.getUTCHours() === hour;
                 });
 
                 // Sort by datetime (oldest first)
@@ -168,7 +170,7 @@
 
                 // Update header with count
                 document.getElementById('hour-header').textContent = 
-                    `Measures for ${hourFormatted} (${hourMeasures.length} measure${hourMeasures.length !== 1 ? 's' : ''})`;
+                    `Measures for ${hourFormatted} UTC (${hourMeasures.length} measure${hourMeasures.length !== 1 ? 's' : ''})`;
 
                 // Create table
                 let tableHTML = `
