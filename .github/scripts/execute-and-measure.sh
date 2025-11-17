@@ -20,18 +20,33 @@ fi
 # Capture start time
 START_TIME=$(date +%s)
 
-# Execute the churrera workflow
+# Execute the churrera workflow with 5 minute timeout
 jbang trust add https://github.com/jabrena/
-jbang churrera@jabrena run --workflow "$WORKFLOW_FILE" --delete-on-success-completion
+# Temporarily disable exit on error to handle timeout gracefully
+set +e
+timeout 300 jbang churrera@jabrena run --workflow "$WORKFLOW_FILE" --delete-on-success-completion
+EXIT_CODE=$?
+set -e
 
 # Capture end time
 END_TIME=$(date +%s)
+
+# Check if timeout occurred (exit code 124 or 143)
+if [ "$EXIT_CODE" -eq 124 ] || [ "$EXIT_CODE" -eq 143 ]; then
+    echo "Warning: Workflow execution timed out after 5 minutes"
+    TIMEOUT_OCCURRED=true
+else
+    TIMEOUT_OCCURRED=false
+fi
 
 # Calculate duration in seconds
 DURATION=$((END_TIME - START_TIME))
 
 # Determine status: UP if less than 120 seconds (2 minutes), DOWN otherwise
-if [ $DURATION -lt 1000 ]; then
+# If timeout occurred, mark as DOWN
+if [ "$TIMEOUT_OCCURRED" = true ]; then
+    STATUS="DOWN"
+elif [ $DURATION -lt 1000 ]; then
     STATUS="UP"
 else
     STATUS="DOWN"
