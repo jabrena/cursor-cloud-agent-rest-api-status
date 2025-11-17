@@ -22,7 +22,7 @@ START_TIME=$(date +%s)
 
 # Execute the churrera workflow
 jbang trust add https://github.com/jabrena/
-jbang churrera@jabrena run "$WORKFLOW_FILE"
+jbang churrera@jabrena run --workflow "$WORKFLOW_FILE" --delete-on-success-completion
 
 # Capture end time
 END_TIME=$(date +%s)
