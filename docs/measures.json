@@ -2158,5 +2158,11 @@
     "status": "UP",
     "latency": 29,
     "test-type": "bash"
+  },
+  {
+    "localdatetime": "20251117 02:42",
+    "status": "UP",
+    "latency": 256,
+    "test-type": "curl io"
   }
 ]
