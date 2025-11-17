@@ -12,6 +12,7 @@ jobs:
     timeout-minutes: 15
     permissions:
       contents: write
+      actions: write
 
     steps:
       - name: Checkout repository
@@ -70,3 +71,10 @@ jobs:
         run: |
           chmod +x .github/scripts/execute-and-measure.sh
           ./.github/scripts/execute-and-measure.sh churrera-recipes/hello-world-java/workflow.xml "java hello world"
+
+      - name: Trigger Cleanup Cursor Branches Workflow
+        continue-on-error: true
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh workflow run cleanup-cursor-branches.yaml --ref main
