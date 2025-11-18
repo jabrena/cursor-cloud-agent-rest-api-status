@@ -34,7 +34,9 @@ jobs:
           retry_wait_seconds: 5
           command: |
             curl -Ls https://sh.jbang.dev | bash -s - app setup
-            echo "$HOME/.jbang/bin" >> $GITHUB_PATH
+
+      - name: Add jbang to PATH
+        run: echo "$HOME/.jbang/bin" >> $GITHUB_PATH
 
       - name: Install jq
         run: |
