@@ -27,9 +27,14 @@ jobs:
           java-version: '25'
 
       - name: Setup jbang
-        run: |
-          curl -Ls https://sh.jbang.dev | bash -s - app setup
-          echo "$HOME/.jbang/bin" >> $GITHUB_PATH
+        uses: nick-invision/retry@v2
+        with:
+          timeout_minutes: 5
+          max_attempts: 3
+          retry_wait_seconds: 5
+          command: |
+            curl -Ls https://sh.jbang.dev | bash -s - app setup
+            echo "$HOME/.jbang/bin" >> $GITHUB_PATH
 
       - name: Install jq
         run: |
