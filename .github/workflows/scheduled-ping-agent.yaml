@@ -27,13 +27,23 @@ jobs:
           java-version: '25'
 
       - name: Setup jbang
-        uses: nick-invision/retry@v2
-        with:
-          timeout_minutes: 5
-          max_attempts: 3
-          retry_wait_seconds: 5
-          command: |
-            curl -Ls https://sh.jbang.dev | bash -s - app setup
+        run: |
+          max_attempts=3
+          attempt=1
+          while [ $attempt -le $max_attempts ]; do
+            echo "Attempt $attempt of $max_attempts"
+            if curl -Ls https://sh.jbang.dev | bash -s - app setup; then
+              echo "jbang setup successful"
+              exit 0
+            fi
+            if [ $attempt -lt $max_attempts ]; then
+              echo "Setup failed, retrying in 5 seconds..."
+              sleep 5
+            fi
+            attempt=$((attempt + 1))
+          done
+          echo "Failed to setup jbang after $max_attempts attempts"
+          exit 1
 
       - name: Add jbang to PATH
         run: echo "$HOME/.jbang/bin" >> $GITHUB_PATH
