@@ -279,13 +279,18 @@ function getCurrentStatus(measures) {
     }
     const uptime = calculateOverallUptime(measures);
     
-    // If uptime is 100%, show green/operational regardless of latest measure
+    // If uptime is 100%, show green/operational
     if (uptime === 100) {
         return { status: 'green', text: 'Operational', uptime, latest: measures[measures.length - 1] };
     }
     
-    // Otherwise, check the latest measure's status
+    // If uptime < 100% but system is operational, show orange/yellow
     const latest = measures[measures.length - 1];
+    if (latest.status === 'UP') {
+        return { status: 'yellow', text: 'Operational', uptime, latest };
+    }
+    
+    // Otherwise, check the latest measure's status (DOWN)
     const color = getStatusColor(latest.status, latest.latency);
     const text = getStatusText(latest.status, latest.latency);
     return { status: color, text, uptime, latest };

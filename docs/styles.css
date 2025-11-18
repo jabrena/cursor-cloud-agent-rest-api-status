@@ -96,6 +96,18 @@ header {
     color: #f5a623;
 }
 
+.status-banner.yellow {
+    background-color: #f5a623;
+}
+
+.status-banner.yellow h2 {
+    color: #fff;
+}
+
+.status-banner.yellow .uptime-info {
+    color: #fff;
+}
+
 .status-banner.down h2 {
     color: #d04437;
 }
