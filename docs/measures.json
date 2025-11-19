@@ -3352,5 +3352,11 @@
     "status": "UP",
     "latency": 72,
     "test-type": "debian package"
+  },
+  {
+    "localdatetime": "20251119 09:11",
+    "status": "DOWN",
+    "latency": 301,
+    "test-type": "java hello world"
   }
 ]
