@@ -4822,5 +4822,11 @@
     "status": "UP",
     "latency": 60,
     "test-type": "java hello world"
+  },
+  {
+    "localdatetime": "20251121 23:03",
+    "status": "UP",
+    "latency": 63,
+    "test-type": "bash"
   }
 ]
