@@ -6826,5 +6826,11 @@
     "status": "UP",
     "latency": 53,
     "test-type": "curl io"
+  },
+  {
+    "localdatetime": "20251125 10:06",
+    "status": "UP",
+    "latency": 97,
+    "test-type": "debian package"
   }
 ]
