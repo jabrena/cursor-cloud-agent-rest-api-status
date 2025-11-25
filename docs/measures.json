@@ -6808,5 +6808,11 @@
     "status": "UP",
     "latency": 85,
     "test-type": "debian package"
+  },
+  {
+    "localdatetime": "20251125 09:09",
+    "status": "UP",
+    "latency": 75,
+    "test-type": "java hello world"
   }
 ]
