@@ -71,6 +71,7 @@
     <acceptance-criteria>
         <acceptance-criteria-list>
             <acceptance-criteria-item>The output is in the correct format</acceptance-criteria-item>
+            <acceptance-criteria-item>The file content is shown in the console</acceptance-criteria-item>
         </acceptance-criteria-list>
     </acceptance-criteria>
 </prompt>
