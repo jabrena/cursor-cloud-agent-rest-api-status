@@ -570,7 +570,7 @@ function createLatencyChart(latencyData) {
             const chartArea = chart.chartArea;
             const xScale = chart.scales.x;
             const xAxisBottom = xScale.bottom;
-            const rowHeight = 12.5; // Half of original height (25/2)
+            const rowHeight = 6.25; // Quarter of original height (25/4)
             const rowSpacing = 3; // Space between timezone rows
             const spacing = 5; // Space between x-axis labels and first timezone row
             const legendSpacing = 8; // Space between timezone rows and legend
@@ -689,7 +689,7 @@ function createLatencyChart(latencyData) {
             maintainAspectRatio: false,
             layout: {
                 padding: {
-                    bottom: 180 // Add padding at bottom for 7 timezone rows and legend
+                    bottom: 140 // Add padding at bottom for 7 timezone rows and legend (reduced for smaller bars)
                 }
             },
             scales: {
