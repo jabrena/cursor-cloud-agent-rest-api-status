@@ -64,8 +64,7 @@
                 <result>RESULT</result>
                 ]]>
             </output-format-item>
-            <output-format-item>The formatted output will be shown in the console</output-format-item>
-            <output-format-item>The formatted output will be not saved in any file</output-format-item>
+            <output-format-item>The formatted output will be saved in a file. Show the file content</output-format-item>
         </output-format-list>
     </output-format>
 
