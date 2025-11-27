@@ -637,12 +637,25 @@ function createLatencyChart(latencyData) {
             ctx.textAlign = 'left';
             ctx.textBaseline = 'top';
             
-            // Draw legend items
+            // Calculate total width of legend items to center them
             const legendRectSize = 15;
             const legendItemSpacing = 20;
-            let legendX = chartArea.left;
+            let totalLegendWidth = 0;
+            
+            // First pass: calculate total width
+            timezones.forEach((tz, index) => {
+                const textWidth = ctx.measureText(tz.name).width;
+                totalLegendWidth += legendRectSize + 8 + textWidth;
+                if (index < timezones.length - 1) {
+                    totalLegendWidth += legendItemSpacing;
+                }
+            });
+            
+            // Center the legend (reuse chartCenterX from above)
+            let legendX = chartCenterX - totalLegendWidth / 2;
             const legendY = legendTop;
             
+            // Second pass: draw legend items
             timezones.forEach((tz, index) => {
                 // Draw colored rectangle for legend indicator
                 ctx.fillStyle = tz.color;
