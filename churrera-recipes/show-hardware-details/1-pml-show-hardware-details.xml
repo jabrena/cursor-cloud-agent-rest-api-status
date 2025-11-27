@@ -23,19 +23,27 @@
                 mvn -version # Maven version
                 # Cloud Provider Detection (try multiple providers)
                 # AWS Metadata
-                if curl -s --max-time 2 http://169.254.169.254/latest/meta-data/instance-type 2>/dev/null >/dev/null; then
+                # Try to fetch IMDSv2 token
+                TOKEN=$(curl -s -X PUT "http://169.254.169.254/latest/api/token" -H "X-aws-ec2-metadata-token-ttl-seconds: 21600" --max-time 2 2>/dev/null)
+                if [ -n "$TOKEN" ]; then
+                    H_OPT="-H X-aws-ec2-metadata-token:$TOKEN"
+                else
+                    H_OPT=""
+                fi
+
+                if curl -s -f --max-time 2 $H_OPT http://169.254.169.254/latest/meta-data/instance-type 2>/dev/null >/dev/null; then
                     echo "AWS Instance detected:"
                     echo -n "Instance Type: "
-                    curl -s --max-time 2 http://169.254.169.254/latest/meta-data/instance-type 2>/dev/null
+                    curl -s --max-time 2 $H_OPT http://169.254.169.254/latest/meta-data/instance-type 2>/dev/null
                     echo ""
                     echo -n "Instance ID: "
-                    curl -s --max-time 2 http://169.254.169.254/latest/meta-data/instance-id 2>/dev/null
+                    curl -s --max-time 2 $H_OPT http://169.254.169.254/latest/meta-data/instance-id 2>/dev/null
                     echo ""
                     echo -n "Availability Zone: "
-                    curl -s --max-time 2 http://169.254.169.254/latest/meta-data/placement/availability-zone 2>/dev/null
+                    curl -s --max-time 2 $H_OPT http://169.254.169.254/latest/meta-data/placement/availability-zone 2>/dev/null
                     echo ""
                     echo -n "Region: "
-                    curl -s --max-time 2 http://169.254.169.254/latest/meta-data/placement/region 2>/dev/null
+                    curl -s --max-time 2 $H_OPT http://169.254.169.254/latest/meta-data/placement/region 2>/dev/null
                     echo ""
                 else
                     echo "Not AWS or metadata unavailable"
