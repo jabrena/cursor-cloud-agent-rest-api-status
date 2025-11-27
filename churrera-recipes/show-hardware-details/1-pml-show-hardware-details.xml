@@ -26,8 +26,13 @@
                 curl -s --max-time 2 http://169.254.169.254/latest/meta-data/instance-type
                 2>/dev/null && echo "AWS Instance Type found" || echo "Not AWS or metadata
                 unavailable"
-                curl -s --max-time 2 http://169.254.169.254/latest/meta-data/instance-id 2>/dev/null
-                || echo "N/A"
+                # Try IMDSv2 first, fallback to IMDSv1
+                TOKEN=$(curl -s --max-time 2 -X PUT "http://169.254.169.254/latest/api/token" -H "X-aws-ec2-metadata-token-ttl-seconds: 21600" 2>/dev/null)
+                if [ -n "$TOKEN" ]; then
+                    curl -s --max-time 2 -H "X-aws-ec2-metadata-token: $TOKEN" http://169.254.169.254/latest/meta-data/instance-id 2>/dev/null || echo "N/A"
+                else
+                    curl -s --max-time 2 http://169.254.169.254/latest/meta-data/instance-id 2>/dev/null || echo "N/A"
+                fi
 
                 # Azure Metadata
                 curl -s --max-time 2 -H "Metadata:true"
