@@ -42,7 +42,8 @@
 
                 Do for all commands.
                 <![CDATA[
-                <result>RESULT</result>
+                <result>
+                RESULT</result>
                 ]]>
             </output-format-item>
         </output-format-list>
