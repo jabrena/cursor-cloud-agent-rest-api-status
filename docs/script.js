@@ -620,9 +620,19 @@ function createLatencyChart(latencyData) {
                 });
             });
             
-            // Draw legend below all timezone rows
+            // Draw "Timezone" label after the last timezone bar (matching "Hour" style)
             const totalRowsHeight = timezones.length * rowHeight + (timezones.length - 1) * rowSpacing;
-            const legendTop = xAxisBottom + spacing + totalRowsHeight + legendSpacing;
+            const lastBarBottom = xAxisBottom + spacing + totalRowsHeight;
+            const timezoneLabelY = lastBarBottom + 15; // Position after last bar with 10px margin top
+            const chartCenterX = chartArea.left + (chartArea.right - chartArea.left) / 2;
+            ctx.font = '12px Arial'; // Match Chart.js default axis title font
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'top';
+            ctx.fillStyle = '#666'; // Match Chart.js default axis title color
+            ctx.fillText('Timezone', chartCenterX, timezoneLabelY);
+            
+            // Draw legend below timezone label
+            const legendTop = timezoneLabelY + 20; // Space after "Timezone" label
             ctx.font = '12px Arial';
             ctx.textAlign = 'left';
             ctx.textBaseline = 'top';
