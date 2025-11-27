@@ -26,18 +26,12 @@
                 curl -s --max-time 2 http://169.254.169.254/latest/meta-data/instance-type
                 2>/dev/null && echo "AWS Instance Type found" || echo "Not AWS or metadata
                 unavailable"
-                # Try IMDSv2 first, fallback to IMDSv1
-                TOKEN=$(curl -s --max-time 2 -X PUT "http://169.254.169.254/latest/api/token" -H "X-aws-ec2-metadata-token-ttl-seconds: 21600" 2>/dev/null); [ -n "$TOKEN" ] && curl -s --max-time 2 -H "X-aws-ec2-metadata-token: $TOKEN" http://169.254.169.254/latest/meta-data/instance-id 2>/dev/null || curl -s --max-time 2 http://169.254.169.254/latest/meta-data/instance-id 2>/dev/null || echo "N/A"
-                # Get availability zone and extract region (remove last character)
-                AZ=$(curl -s --max-time 2 http://169.254.169.254/latest/meta-data/placement/availability-zone 2>/dev/null); [ -n "$AZ" ] && echo "${AZ%?}" || echo "N/A"                # Azure Metadata
-                curl -s --max-time 2 -H "Metadata:true"
-                http://169.254.169.254/metadata/instance?api-version=2021-02-01 2>/dev/null | head
-                -c 200 || echo "Not Azure or metadata unavailable"
+
+                # Azure Metadata
+                curl -s --max-time 2 -H "Metadata:true" http://169.254.169.254/metadata/instance?api-version=2021-02-01 2>/dev/null | head -c 200 || echo "Not Azure or metadata unavailable"
 
                 # GCP Metadata
-                curl -s --max-time 2 -H "Metadata-Flavor: Google"
-                http://169.254.169.254/computeMetadata/v1/instance/machine-type 2>/dev/null || echo
-                "Not GCP or metadata unavailable"
+                curl -s --max-time 2 -H "Metadata-Flavor: Google" http://169.254.169.254/computeMetadata/v1/instance/machine-type 2>/dev/null || echo "Not GCP or metadata unavailable"
                 ```
                 ]]>
             </step-content>
