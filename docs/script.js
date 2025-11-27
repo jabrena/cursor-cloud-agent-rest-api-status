@@ -460,6 +460,79 @@ function createLatencyChart(latencyData) {
         return hour.toString().padStart(2, '0') + ':00';
     });
     
+    // Convert UTC hours to different timezones (using standard time offsets)
+    // ET: UTC-5 (EST), CT: UTC-6 (CST), PT: UTC-8 (PST), CET: UTC+1
+    const getETHour = (utcHour) => {
+        return (utcHour - 5 + 24) % 24; // UTC-5
+    };
+    
+    const getCTHour = (utcHour) => {
+        return (utcHour - 6 + 24) % 24; // UTC-6
+    };
+    
+    const getPTHour = (utcHour) => {
+        return (utcHour - 8 + 24) % 24; // UTC-8
+    };
+    
+    const getCETHour = (utcHour) => {
+        return (utcHour + 1) % 24; // UTC+1
+    };
+    
+    const getISTHour = (utcHour) => {
+        // IST: UTC+5:30, approximate to nearest hour
+        // UTC 3:30 = IST 9:00, UTC 4:30 = IST 10:00, etc.
+        // For hourly approximation: UTC 4-11 maps to IST 9-17
+        return (utcHour + 5) % 24; // Approximate UTC+5:30 as UTC+5
+    };
+    
+    const getCSTHour = (utcHour) => {
+        return (utcHour + 8) % 24; // UTC+8 (China Standard Time)
+    };
+    
+    const getJSTHour = (utcHour) => {
+        return (utcHour + 9) % 24; // UTC+9
+    };
+    
+    // Track which hours should have bars for each timezone (9-17 local time)
+    const etBarHours = latencyData.hours.map(h => {
+        const etHour = getETHour(h.hour);
+        return etHour >= 9 && etHour <= 17;
+    });
+    
+    const ctBarHours = latencyData.hours.map(h => {
+        const ctHour = getCTHour(h.hour);
+        return ctHour >= 9 && ctHour <= 17;
+    });
+    
+    const ptBarHours = latencyData.hours.map(h => {
+        const ptHour = getPTHour(h.hour);
+        return ptHour >= 9 && ptHour <= 17;
+    });
+    
+    const cetBarHours = latencyData.hours.map(h => {
+        const cetHour = getCETHour(h.hour);
+        return cetHour >= 9 && cetHour <= 17;
+    });
+    
+    const istBarHours = latencyData.hours.map(h => {
+        // IST: UTC+5:30
+        // UTC 3:30 = IST 9:00, UTC 11:30 = IST 17:00
+        // For hourly approximation: UTC 3-11 maps to IST 9-17
+        // More precisely: UTC hour 3 (3:00-3:59) ≈ IST 8:30-9:29 (rounds to 9)
+        //                 UTC hour 11 (11:00-11:59) ≈ IST 16:30-17:29 (rounds to 17)
+        return h.hour >= 3 && h.hour <= 11;
+    });
+    
+    const cstBarHours = latencyData.hours.map(h => {
+        const cstHour = getCSTHour(h.hour);
+        return cstHour >= 9 && cstHour <= 17;
+    });
+    
+    const jstBarHours = latencyData.hours.map(h => {
+        const jstHour = getJSTHour(h.hour);
+        return jstHour >= 9 && jstHour <= 17;
+    });
+    
     // Define colors for each test-type
     const colors = {
         'bash': '#47b881',
@@ -489,15 +562,113 @@ function createLatencyChart(latencyData) {
         };
     });
 
+    // Plugin to draw timezone rows and legend
+    const timezonePlugin = {
+        id: 'timezonePlugin',
+        afterDraw: (chart) => {
+            const ctx = chart.ctx;
+            const chartArea = chart.chartArea;
+            const xScale = chart.scales.x;
+            const xAxisBottom = xScale.bottom;
+            const rowHeight = 12.5; // Half of original height (25/2)
+            const rowSpacing = 3; // Space between timezone rows
+            const spacing = 5; // Space between x-axis labels and first timezone row
+            const legendSpacing = 8; // Space between timezone rows and legend
+            
+            // Timezone colors
+            const timezoneColors = {
+                et: '#2E86AB',  // Blue for Eastern Time
+                ct: '#F18F01',  // Orange for Central Time
+                pt: '#C77DFF',  // Purple for Pacific Time
+                cet: '#006994',  // Marine blue for CET
+                ist: '#FF6B6B',  // Red for India Standard Time
+                cst: '#4ECDC4',  // Teal for China Standard Time
+                jst: '#95E1D3'   // Light teal for Japan Standard Time
+            };
+            
+            // Timezone configurations (order: ET, CT, PT, CET, IST, CST, JST)
+            const timezones = [
+                { name: 'ET', label: 'Eastern Time (ET)', hours: etBarHours, color: timezoneColors.et, offset: 'UTC-5/UTC-4' },
+                { name: 'CT', label: 'Central Time (CT)', hours: ctBarHours, color: timezoneColors.ct, offset: 'UTC-6/UTC-5' },
+                { name: 'PT', label: 'Pacific Time (PT)', hours: ptBarHours, color: timezoneColors.pt, offset: 'UTC-8/UTC-7' },
+                { name: 'CET', label: 'CET', hours: cetBarHours, color: timezoneColors.cet, offset: 'UTC+1' },
+                { name: 'IST', label: 'IST', hours: istBarHours, color: timezoneColors.ist, offset: 'UTC+5:30' },
+                { name: 'CST', label: 'CST', hours: cstBarHours, color: timezoneColors.cst, offset: 'UTC+8' },
+                { name: 'JST', label: 'JST', hours: jstBarHours, color: timezoneColors.jst, offset: 'UTC+9' }
+            ];
+            
+            ctx.save();
+            
+            // Calculate width of each hour segment
+            const firstX = xScale.getPixelForValue(0);
+            const secondX = xScale.getPixelForValue(1);
+            const segmentWidth = secondX - firstX;
+            
+            // Draw timezone bars (stacked vertically)
+            timezones.forEach((tz, tzIndex) => {
+                const rowTop = xAxisBottom + spacing + (tzIndex * (rowHeight + rowSpacing));
+                
+                labels.forEach((label, index) => {
+                    if (tz.hours[index]) {
+                        const x = xScale.getPixelForValue(index);
+                        const segmentLeft = x - segmentWidth / 2;
+                        
+                        // Draw rectangle for this hour segment
+                        ctx.fillStyle = tz.color;
+                        ctx.fillRect(segmentLeft, rowTop, segmentWidth, rowHeight);
+                    }
+                });
+            });
+            
+            // Draw legend below all timezone rows
+            const totalRowsHeight = timezones.length * rowHeight + (timezones.length - 1) * rowSpacing;
+            const legendTop = xAxisBottom + spacing + totalRowsHeight + legendSpacing;
+            ctx.font = '12px Arial';
+            ctx.textAlign = 'left';
+            ctx.textBaseline = 'top';
+            
+            // Draw legend items
+            const legendRectSize = 15;
+            const legendItemSpacing = 20;
+            let legendX = chartArea.left;
+            const legendY = legendTop;
+            
+            timezones.forEach((tz, index) => {
+                // Draw colored rectangle for legend indicator
+                ctx.fillStyle = tz.color;
+                ctx.fillRect(legendX, legendY, legendRectSize, legendRectSize);
+                
+                // Draw legend text - only timezone abbreviation
+                ctx.fillStyle = '#000000';
+                const legendText = tz.name;
+                ctx.fillText(legendText, legendX + legendRectSize + 8, legendY + 1);
+                
+                // Move to next legend item (if not last)
+                if (index < timezones.length - 1) {
+                    const textWidth = ctx.measureText(legendText).width;
+                    legendX += legendRectSize + 8 + textWidth + legendItemSpacing;
+                }
+            });
+            
+            ctx.restore();
+        }
+    };
+
     const chart = new Chart(ctx, {
         type: 'line',
         data: {
             labels: labels,
             datasets: datasets
         },
+        plugins: [timezonePlugin],
         options: {
             responsive: true,
             maintainAspectRatio: false,
+            layout: {
+                padding: {
+                    bottom: 180 // Add padding at bottom for 7 timezone rows and legend
+                }
+            },
             scales: {
                 y: {
                     beginAtZero: true,
