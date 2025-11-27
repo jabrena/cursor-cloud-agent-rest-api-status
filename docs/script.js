@@ -464,9 +464,12 @@ function createLatencyChart(latencyData) {
     const colors = {
         'bash': '#47b881',
         'curl io': '#3498db',
+        'curl io v2': '#9b59b6',
         'debian package': '#e74c3c',
-        // Add more colors for additional test-types if needed
-        'default': '#9b59b6'
+        'java hello world': '#f39c12',
+        'sdkman package': '#1abc9c',
+        // Fallback for any unknown test-types
+        'default': '#95a5a6'
     };
     
     // Create datasets for each test-type
