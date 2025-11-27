@@ -23,9 +23,15 @@
                 mvn -version # Maven version
                 # Cloud Provider Detection (try multiple providers)
                 # AWS Metadata
-                curl -s --max-time 2 http://169.254.169.254/latest/meta-data/instance-type
-                2>/dev/null && echo "AWS Instance Type found" || echo "Not AWS or metadata
-                unavailable"
+                if curl -s --max-time 2 http://169.254.169.254/latest/meta-data/instance-type 2>/dev/null > /dev/null; then
+                    echo "AWS Instance detected:"
+                    echo "Instance Type: $(curl -s --max-time 2 http://169.254.169.254/latest/meta-data/instance-type 2>/dev/null)"
+                    echo "Instance ID: $(curl -s --max-time 2 http://169.254.169.254/latest/meta-data/instance-id 2>/dev/null)"
+                    echo "Availability Zone: $(curl -s --max-time 2 http://169.254.169.254/latest/meta-data/placement/availability-zone 2>/dev/null)"
+                    echo "Region: $(curl -s --max-time 2 http://169.254.169.254/latest/meta-data/placement/region 2>/dev/null)"
+                else
+                    echo "Not AWS or metadata unavailable"
+                fi
 
                 # Azure Metadata
                 curl -s --max-time 2 -H "Metadata:true" http://169.254.169.254/metadata/instance?api-version=2021-02-01 2>/dev/null | head -c 200 || echo "Not Azure or metadata unavailable"
