@@ -46,8 +46,7 @@
 
     <acceptance-criteria>
         <acceptance-criteria-list>
-            <acceptance-criteria-item>The java version is 25</acceptance-criteria-item>
-            <acceptance-criteria-item>The java installation is successful</acceptance-criteria-item>
+            <acceptance-criteria-item>The output is in the correct format</acceptance-criteria-item>
         </acceptance-criteria-list>
     </acceptance-criteria>
 </prompt>
