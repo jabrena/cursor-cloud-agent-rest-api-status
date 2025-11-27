@@ -23,12 +23,16 @@
                 mvn -version # Maven version
                 # Cloud Provider Detection (try multiple providers)
                 # AWS Metadata
-                if curl -s --max-time 2 http://169.254.169.254/latest/meta-data/instance-type 2>/dev/null > /dev/null; then
+                AWS_INSTANCE_TYPE=$(curl -s --max-time 2 http://169.254.169.254/latest/meta-data/instance-type 2>/dev/null)
+                if [ -n "$AWS_INSTANCE_TYPE" ]; then
+                    AWS_INSTANCE_ID=$(curl -s --max-time 2 http://169.254.169.254/latest/meta-data/instance-id 2>/dev/null)
+                    AWS_AZ=$(curl -s --max-time 2 http://169.254.169.254/latest/meta-data/placement/availability-zone 2>/dev/null)
+                    AWS_REGION=$(curl -s --max-time 2 http://169.254.169.254/latest/meta-data/placement/region 2>/dev/null)
                     echo "AWS Instance detected:"
-                    echo "Instance Type: $(curl -s --max-time 2 http://169.254.169.254/latest/meta-data/instance-type 2>/dev/null)"
-                    echo "Instance ID: $(curl -s --max-time 2 http://169.254.169.254/latest/meta-data/instance-id 2>/dev/null)"
-                    echo "Availability Zone: $(curl -s --max-time 2 http://169.254.169.254/latest/meta-data/placement/availability-zone 2>/dev/null)"
-                    echo "Region: $(curl -s --max-time 2 http://169.254.169.254/latest/meta-data/placement/region 2>/dev/null)"
+                    echo "Instance Type: $AWS_INSTANCE_TYPE"
+                    echo "Instance ID: $AWS_INSTANCE_ID"
+                    echo "Availability Zone: $AWS_AZ"
+                    echo "Region: $AWS_REGION"
                 else
                     echo "Not AWS or metadata unavailable"
                 fi
