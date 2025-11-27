@@ -26,7 +26,7 @@ jobs:
           curl -Ls https://sh.jbang.dev | bash -s - app setup
           echo "$HOME/.jbang/bin" >> $GITHUB_PATH
 
-      - name: Execute Cursor Cloud Agent about continuous documentation
+      - name: Execute PML Worflow with Churrera
         env:
           CURSOR_API_KEY: ${{ secrets.CURSOR_API_KEY }}
         run: |
