@@ -44,8 +44,6 @@
         </output-format-list>
     </output-format>
 
-    <safeguards>Verify that java is configured for java 25 executing `java -version`</safeguards>
-
     <acceptance-criteria>
         <acceptance-criteria-list>
             <acceptance-criteria-item>The java version is 25</acceptance-criteria-item>
