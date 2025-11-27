@@ -31,6 +31,7 @@ jobs:
           CURSOR_API_KEY: ${{ secrets.CURSOR_API_KEY }}
         run: |
           jbang trust add https://github.com/jabrena/
+          jbang churrera@jabrena --list-models
           jbang churrera@jabrena run --workflow churrera-recipes/show-hardware-details/workflow.xml \
           --show-logs --delete-on-success-completion
 
