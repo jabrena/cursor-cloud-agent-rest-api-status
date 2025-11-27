@@ -14,9 +14,6 @@
 
                 ```bash
                 lscpu # CPU architecture and details
-                lsblk # block devices (disks, partitions)
-                lspci # PCI devices (graphics cards, network cards, etc.)
-                lsusb # USB devices
                 free -h # RAM usage and total memory
                 df -h # disk space usage
                 ```
@@ -32,11 +29,14 @@
     <output-format>
         <output-format-list>
             <output-format-item>Show the output of the commands</output-format-item>
-            <output-format-item>Replace in the following xml fragment the RESULT with the actual
-                result of the execution of all commands. 
+            <output-format-item>Replace in the following xml fragment the RESULT with:
+                Comand: the command used + return 2 new lines +
+                result of the execution of the commands. 
                 
                 After every execution add a new line 
                 and "--------------------------------" as a separator.
+
+                Do for all commands.
                 <![CDATA[
                 <result>RESULT</result>
                 ]]>
