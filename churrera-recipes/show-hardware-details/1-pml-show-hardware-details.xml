@@ -64,15 +64,12 @@
                 <result>RESULT</result>
                 ]]>
             </output-format-item>
-            <output-format-item>Print results in the console.</output-format-item>
-            <output-format-item>Not print a summary, show all results in the console</output-format-item>
         </output-format-list>
     </output-format>
 
     <acceptance-criteria>
         <acceptance-criteria-list>
             <acceptance-criteria-item>The output is in the correct format</acceptance-criteria-item>
-            <acceptance-criteria-item>Print the results in the console</acceptance-criteria-item>
         </acceptance-criteria-list>
     </acceptance-criteria>
 </prompt>
