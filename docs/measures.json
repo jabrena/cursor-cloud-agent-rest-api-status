@@ -7960,5 +7960,11 @@
     "status": "DOWN",
     "latency": 301,
     "test-type": "java hello world"
+  },
+  {
+    "localdatetime": "20251127 10:03",
+    "status": "UP",
+    "latency": 29,
+    "test-type": "bash"
   }
 ]
