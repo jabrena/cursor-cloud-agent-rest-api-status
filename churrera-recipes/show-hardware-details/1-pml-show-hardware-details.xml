@@ -64,15 +64,14 @@
                 <result>RESULT</result>
                 ]]>
             </output-format-item>
-            <output-format-item>The formatted output will be saved in a file named hardware-details.txt.</output-format-item>
-            <output-format-item>The file content will be shown in the console</output-format-item>
+            <output-format-item>Print results in the console.</output-format-item>
         </output-format-list>
     </output-format>
 
     <acceptance-criteria>
         <acceptance-criteria-list>
             <acceptance-criteria-item>The output is in the correct format</acceptance-criteria-item>
-            <acceptance-criteria-item>Print the file content is shown in the console</acceptance-criteria-item>
+            <acceptance-criteria-item>Print the results in the console</acceptance-criteria-item>
         </acceptance-criteria-list>
     </acceptance-criteria>
 </prompt>
