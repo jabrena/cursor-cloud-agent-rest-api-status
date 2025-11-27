@@ -65,6 +65,7 @@
                 ]]>
             </output-format-item>
             <output-format-item>Print results in the console.</output-format-item>
+            <output-format-item>Not print a summary, show all results in the console</output-format-item>
         </output-format-list>
     </output-format>
 
