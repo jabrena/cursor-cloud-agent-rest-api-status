@@ -31,22 +31,32 @@
                     H_OPT=""
                 fi
 
-                if curl -s -f --max-time 2 $H_OPT http://169.254.169.254/latest/meta-data/instance-type 2>/dev/null >/dev/null; then
+                # Check if we can access instance-id (fast check)
+                if curl -s -f --max-time 2 $H_OPT http://169.254.169.254/latest/meta-data/instance-id >/dev/null 2>&1; then
                     echo "AWS Instance detected:"
+                    
                     echo -n "Instance Type: "
                     curl -s --max-time 2 $H_OPT http://169.254.169.254/latest/meta-data/instance-type 2>/dev/null
                     echo ""
+                    
                     echo -n "Instance ID: "
                     curl -s --max-time 2 $H_OPT http://169.254.169.254/latest/meta-data/instance-id 2>/dev/null
                     echo ""
+                    
                     echo -n "Availability Zone: "
                     curl -s --max-time 2 $H_OPT http://169.254.169.254/latest/meta-data/placement/availability-zone 2>/dev/null
                     echo ""
+                    
                     echo -n "Region: "
                     curl -s --max-time 2 $H_OPT http://169.254.169.254/latest/meta-data/placement/region 2>/dev/null
                     echo ""
                 else
-                    echo "Not AWS or metadata unavailable"
+                    # Fallback DMI check
+                    if grep -q "Amazon" /sys/class/dmi/id/sys_vendor 2>/dev/null; then
+                        echo "AWS Instance detected (Metadata unavailable)"
+                    else
+                        echo "Not AWS or metadata unavailable"
+                    fi
                 fi
 
                 # Azure Metadata
