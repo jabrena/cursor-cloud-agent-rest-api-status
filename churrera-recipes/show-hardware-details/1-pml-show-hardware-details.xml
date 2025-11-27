@@ -14,6 +14,8 @@
 
                 ```bash
                 lscpu # CPU architecture and details
+                nproc # Number of processing units
+                uname -a # System information
                 free -h # RAM usage and total memory
                 df -h # disk space usage
                 java -version # Java version
