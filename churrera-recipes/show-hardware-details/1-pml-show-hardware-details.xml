@@ -16,6 +16,8 @@
                 lscpu # CPU architecture and details
                 free -h # RAM usage and total memory
                 df -h # disk space usage
+                java -version # Java version
+                mvn -version # Maven version
                 ```
             </step-content>
             <step-constraints>
