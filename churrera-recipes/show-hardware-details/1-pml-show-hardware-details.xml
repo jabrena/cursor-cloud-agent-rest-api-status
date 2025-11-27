@@ -49,6 +49,7 @@
             <step-constraints>
                 <step-constraint-list>
                     <step-constraint>Do not invest time in planning</step-constraint>
+                    <step-constraint>Not save results in a file</step-constraint>
                 </step-constraint-list>
             </step-constraints>
         </step>
