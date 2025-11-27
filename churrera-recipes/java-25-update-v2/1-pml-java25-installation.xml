@@ -8,11 +8,15 @@
 
     <steps>
         <step number="1">
-            <step-title>Install Java 25 using a debian package</step-title>
+            <step-title>Install Java 25 with SDKMAN</step-title>
             <step-content>
                 ```bash
                 sudo apt update
-                sudo apt install -y openjdk-25-jdk
+                # Install SDKMAN
+                curl -s "https://get.sdkman.io" | bash
+                source "$HOME/.sdkman/bin/sdkman-init.sh"
+                sdk install java 25.0.1-graalce
+                sdk default java 25.0.1-graalce
                 java -version
                 ```
             </step-content>

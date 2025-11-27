@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<prompt xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="https://jabrena.github.io/pml/schemas/0.3.0/pml.xsd">
+
+    <title>Fallback Prompt</title>
+
+    <goal>
+        Stop all running activities from the Agent.
+        If the Agent is running a bash script, stop it
+        If the Agent is running a Java maven build, stop it.
+        If the Agent is running coding activity, stop it.
+        If the Agent is running any other activity, stop it.
+
+        If you have any local changes, commit them and push to the branch.
+
+        if a running process has some concerns, share a summary.
+
+        Put the Agent in a terminal state as FINISHED.
+    </goal>
+</prompt>

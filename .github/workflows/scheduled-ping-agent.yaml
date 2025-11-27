@@ -54,6 +54,15 @@ jobs:
           chmod +x .github/scripts/execute-and-measure.sh
           ./.github/scripts/execute-and-measure.sh churrera-recipes/check-internet-connectivity/workflow.xml "curl io"
 
+      - name: Check Internet Connectivity v2
+        continue-on-error: true
+        env:
+          CURSOR_API_KEY: ${{ secrets.CURSOR_API_KEY }}
+          GITHUB_ACTIONS: true
+        run: |
+          chmod +x .github/scripts/execute-and-measure.sh
+          ./.github/scripts/execute-and-measure.sh churrera-recipes/check-internet-connectivity/workflow.xml "curl io v2"
+
       - name: Execute Java 25 Update Workflow
         continue-on-error: true
         env:
@@ -62,6 +71,15 @@ jobs:
         run: |
           chmod +x .github/scripts/execute-and-measure.sh
           ./.github/scripts/execute-and-measure.sh churrera-recipes/java-25-update/workflow.xml "debian package"
+
+      - name: Execute Java 25 Update Workflow v2
+        continue-on-error: true
+        env:
+          CURSOR_API_KEY: ${{ secrets.CURSOR_API_KEY }}
+          GITHUB_ACTIONS: true
+        run: |
+          chmod +x .github/scripts/execute-and-measure.sh
+          ./.github/scripts/execute-and-measure.sh churrera-recipes/java-25-update-v2/workflow.xml "SDKMAN package"
 
       - name: Execute Hello World Java Workflow
         continue-on-error: true
