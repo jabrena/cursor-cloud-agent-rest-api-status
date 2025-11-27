@@ -12,6 +12,7 @@
             <step-content>
                 Execute following commands:
 
+                <![CDATA[ 
                 ```bash
                 lscpu # CPU architecture and details
                 nproc # Number of processing units
@@ -38,6 +39,7 @@
                 http://169.254.169.254/computeMetadata/v1/instance/machine-type 2>/dev/null || echo
                 "Not GCP or metadata unavailable"
                 ```
+                ]]>
             </step-content>
             <step-constraints>
                 <step-constraint-list>
