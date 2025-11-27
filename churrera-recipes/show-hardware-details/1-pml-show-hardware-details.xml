@@ -20,6 +20,15 @@
                 df -h # disk space usage
                 java -version # Java version
                 mvn -version # Maven version
+                # AWS Instance Metadata (most reliable method)
+                curl -s http://169.254.169.254/latest/meta-data/instance-type # Instance type (e.g.,
+                t3.micro, m5.large)
+                curl -s http://169.254.169.254/latest/meta-data/instance-id # Instance ID
+                curl -s http://169.254.169.254/latest/meta-data/instance-life-cycle # Instance
+                lifecycle (spot, on-demand, etc.)
+                curl -s http://169.254.169.254/latest/meta-data/placement/availability-zone #
+                Availability zone
+                curl -s http://169.254.169.254/latest/meta-data/ami-id # AMI ID
                 ```
             </step-content>
             <step-constraints>
