@@ -17,6 +17,27 @@ body {
     padding: 20px;
 }
 
+.cursor-status-link {
+    text-align: center;
+    margin-top: 0px;
+    margin-bottom: 0px;
+    padding-top: 0px;
+    padding-bottom: 0px;
+    padding-left: 20px;
+    padding-right: 20px;
+    font-size: 18px;
+    color: #333;
+}
+
+.cursor-status-link a {
+    color: #0066cc;
+    text-decoration: none;
+}
+
+.cursor-status-link a:hover {
+    text-decoration: underline;
+}
+
 header {
     background-color: #000;
     border-bottom: 1px solid #333;
