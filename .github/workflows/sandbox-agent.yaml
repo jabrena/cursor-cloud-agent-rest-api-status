@@ -1,0 +1,35 @@
+name: Sandbox Agent
+
+on:
+  workflow_dispatch:
+
+jobs:
+  sandbox-agent:
+    name: Sandbox Agent Execution
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+        with:
+          submodules: true
+
+      - name: Setup Java 25 with GraalVM
+        uses: actions/setup-java@v5
+        with:
+          distribution: 'graalvm'
+          java-version: '25'
+
+      - name: Setup jbang
+        run: |
+          curl -Ls https://sh.jbang.dev | bash -s - app setup
+          echo "$HOME/.jbang/bin" >> $GITHUB_PATH
+
+      - name: Execute Cursor Cloud Agent about continuous documentation
+        env:
+          CURSOR_API_KEY: ${{ secrets.CURSOR_API_KEY }}
+        run: |
+          jbang trust add https://github.com/jabrena/
+          jbang churrera@jabrena run --workflow churrera-recipes/show-hardware-details/workflow.xml --delete-on-success-completion
+

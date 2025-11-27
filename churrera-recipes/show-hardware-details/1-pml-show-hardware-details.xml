@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<prompt>
+    <title>Show Hardware Details about the Cursor Cloud Agent</title>
+
+    <role>System Administrator with expertise in Java development environments and package management for Linux systems</role>
+
+    <goal>Show the hardware details about the Cursor Cloud Agent. Follow the next step to achieve the goal.</goal>
+
+    <steps>
+        <step number="1">
+            <step-title>Show hardware details</step-title>
+            <step-content>
+                Execute following commands:
+
+                ```bash
+                lscpu # CPU architecture and details
+                lsblk # block devices (disks, partitions)
+                lspci # PCI devices (graphics cards, network cards, etc.)
+                lsusb # USB devices
+                free -h # RAM usage and total memory
+                df -h # disk space usage
+                ```
+            </step-content>
+            <step-constraints>
+                <step-constraint-list>
+                    <step-constraint>Do not invest time in planning</step-constraint>
+                </step-constraint-list>
+            </step-constraints>
+        </step>
+    </steps>
+
+    <output-format>
+        <output-format-list>
+            <output-format-item>Show the output of the commands</output-format-item>
+            <output-format-item>Replace in the following xml fragment the RESULT with the actual
+                result of the execution of all commands. 
+                
+                After every execution add a new line 
+                and "--------------------------------" as a separator.
+                <![CDATA[
+                <result>RESULT</result>
+                ]]>
+            </output-format-item>
+        </output-format-list>
+    </output-format>
+
+    <safeguards>Verify that java is configured for java 25 executing `java -version`</safeguards>
+
+    <acceptance-criteria>
+        <acceptance-criteria-list>
+            <acceptance-criteria-item>The java version is 25</acceptance-criteria-item>
+            <acceptance-criteria-item>The java installation is successful</acceptance-criteria-item>
+        </acceptance-criteria-list>
+    </acceptance-criteria>
+</prompt>
