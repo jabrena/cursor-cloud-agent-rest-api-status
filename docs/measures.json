@@ -8074,5 +8074,11 @@
     "status": "UP",
     "latency": 28,
     "test-type": "curl io v2"
+  },
+  {
+    "localdatetime": "20251127 13:15",
+    "status": "UP",
+    "latency": 71,
+    "test-type": "debian package"
   }
 ]
