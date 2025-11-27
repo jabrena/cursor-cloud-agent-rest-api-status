@@ -79,7 +79,7 @@ jobs:
           GITHUB_ACTIONS: true
         run: |
           chmod +x .github/scripts/execute-and-measure.sh
-          ./.github/scripts/execute-and-measure.sh churrera-recipes/java-25-update-v2/workflow.xml "SDKMAN package"
+          ./.github/scripts/execute-and-measure.sh churrera-recipes/java-25-update-v2/workflow.xml "sdkman package"
 
       - name: Execute Hello World Java Workflow
         continue-on-error: true
