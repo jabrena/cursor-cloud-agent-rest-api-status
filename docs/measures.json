@@ -8824,5 +8824,11 @@
     "status": "UP",
     "latency": 27,
     "test-type": "curl io"
+  },
+  {
+    "localdatetime": "20251128 10:04",
+    "status": "UP",
+    "latency": 27,
+    "test-type": "curl io v2"
   }
 ]
