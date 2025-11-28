@@ -9010,5 +9010,11 @@
     "status": "UP",
     "latency": 38,
     "test-type": "curl io v2"
+  },
+  {
+    "localdatetime": "20251128 15:05",
+    "status": "UP",
+    "latency": 60,
+    "test-type": "debian package"
   }
 ]
