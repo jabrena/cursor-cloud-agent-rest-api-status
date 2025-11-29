@@ -9376,5 +9376,11 @@
     "status": "UP",
     "latency": 39,
     "test-type": "debian package"
+  },
+  {
+    "localdatetime": "20251129 01:35",
+    "status": "UP",
+    "latency": 82,
+    "test-type": "sdkman package"
   }
 ]
