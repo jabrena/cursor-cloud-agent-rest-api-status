@@ -6,7 +6,7 @@
         Check internet connectivity using a curl command
 
         ```bash
-        curl -L https://www.google.com/ | grep "Google"
+        curl -L https://google.com/ | grep "Google"
         ```
     </goal>
 

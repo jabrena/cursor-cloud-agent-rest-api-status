@@ -32,5 +32,5 @@ jobs:
         run: |
           jbang trust add https://github.com/jabrena/
           jbang churrera@jabrena run --retrieve-models
-          jbang churrera@jabrena run --workflow churrera-recipes/show-hardware-details/workflow.xml \
+          jbang churrera@jabrena run --workflow churrera-recipes/show-traceroute/workflow.xml \
           --show-logs --delete-on-success-completion

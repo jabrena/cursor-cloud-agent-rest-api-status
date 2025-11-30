@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<prompt>
+    <title>Show Hardware Details about the Cursor Cloud Agent</title>
+
+    <role>System Administrator with expertise in Java development environments and package management for Linux systems</role>
+
+    <goal>Show network details about the Cursor Cloud Agent. Follow the next step to achieve the goal.</goal>
+
+    <steps>
+        <step number="1">
+            <step-title>Show hardware details</step-title>
+            <step-content>
+                Execute following commands:
+
+                <![CDATA[ 
+                ```bash
+                curl --dns-servers 8.8.8.8 -L https://marca.com | grep "Marca"
+                traceroute www.marca.com
+                traceroute www.as.com
+                traceroute www.google.com
+                curl http://ip-api.com/json/ | jq
+                ```
+                ]]>
+            </step-content>
+            <step-constraints>
+                <step-constraint-list>
+                    <step-constraint>Do not invest time in planning</step-constraint>
+                    <step-constraint>Not save results in a file</step-constraint>
+                </step-constraint-list>
+            </step-constraints>
+        </step>
+    </steps>
+
+    <output-format>
+        <output-format-list>
+            <output-format-item>Show the output of the commands</output-format-item>
+            <output-format-item>Replace in the following xml fragment the RESULT with:
+                Comand: the command used + return 2 new lines +
+                result of the execution of the commands. 
+                
+                After every execution add a new line 
+                and "--------------------------------" as a separator.
+
+                Do for all commands.
+                <![CDATA[
+                <result>RESULT</result>
+                ]]>
+            </output-format-item>
+        </output-format-list>
+    </output-format>
+
+    <acceptance-criteria>
+        <acceptance-criteria-list>
+            <acceptance-criteria-item>The output is in the correct format</acceptance-criteria-item>
+        </acceptance-criteria-list>
+    </acceptance-criteria>
+</prompt>

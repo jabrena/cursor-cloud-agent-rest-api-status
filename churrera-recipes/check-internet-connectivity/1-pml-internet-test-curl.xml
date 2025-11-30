@@ -6,7 +6,7 @@
         Check internet connectivity using a curl command
 
         ```bash
-        curl -L https://marca.com | grep "Marca"
+        curl --dns-servers 8.8.8.8 -L https://marca.com | grep "Marca"
         ```
     </goal>
 
