@@ -19,7 +19,7 @@
                 sudo apt upgrade -y traceroute inetutils-traceroute curl libcurl4 jq 
                 traceroute --version
                 curl --version
-                resolvectl status
+                cat /etc/resolv.conf
                 curl --dns-servers 8.8.8.8 -L https://marca.com | grep -i "Marca" | head -5
                 traceroute -m 64 www.marca.com
                 traceroute -m 64 www.as.com
