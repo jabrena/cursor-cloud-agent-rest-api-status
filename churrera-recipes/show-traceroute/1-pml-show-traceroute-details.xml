@@ -21,9 +21,9 @@
                 curl --version
                 resolvectl status
                 curl --dns-servers 8.8.8.8 -L https://marca.com | grep -i "Marca" | head -5
-                traceroute www.marca.com
-                traceroute www.as.com
-                traceroute www.google.com
+                traceroute -m 64 www.marca.com
+                traceroute -m 64 www.as.com
+                traceroute -m 64 www.google.com
                 curl http://ip-api.com/json/ | jq
                 ```
                 ]]>
