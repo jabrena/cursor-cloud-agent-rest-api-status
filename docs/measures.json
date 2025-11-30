@@ -10210,5 +10210,11 @@
     "status": "UP",
     "latency": 73,
     "test-type": "sdkman package"
+  },
+  {
+    "localdatetime": "20251130 00:11",
+    "status": "UP",
+    "latency": 59,
+    "test-type": "java hello world"
   }
 ]
