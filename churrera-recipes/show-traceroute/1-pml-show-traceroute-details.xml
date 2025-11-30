@@ -14,6 +14,10 @@
 
                 <![CDATA[ 
                 ```bash
+                sudo apt update
+                sudo apt install traceroute curl jq
+                traceroute --version
+                curl --version
                 curl --dns-servers 8.8.8.8 -L https://marca.com | grep "Marca"
                 traceroute www.marca.com
                 traceroute www.as.com
