@@ -15,8 +15,7 @@
                 <![CDATA[ 
                 ```bash
                 sudo apt update
-                sudo apt install -y traceroute inetutils-traceroute curl libcurl4 jq 
-                sudo apt upgrade -y traceroute inetutils-traceroute curl libcurl4 jq 
+                sudo apt install -y traceroute inetutils-traceroute curl libcurl4 jq
                 traceroute --version
                 curl --version
                 cat /etc/resolv.conf
