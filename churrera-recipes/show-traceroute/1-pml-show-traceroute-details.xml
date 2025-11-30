@@ -21,7 +21,7 @@
                 cat /etc/resolv.conf
                 sudo sed -i 's/nameserver 1.1.1.1/nameserver 8.8.8.8/g' /etc/resolv.conf
                 cat /etc/resolv.conf
-                curl --dns-servers 8.8.8.8 -L https://marca.com | grep -i "Marca" | head -5
+                curl -L https://marca.com | grep -i "Marca" | head -5
                 traceroute -T -m 64 -w 3 www.marca.com
                 traceroute -T -m 64 -w 3 www.as.com
                 traceroute -T -m 64 -w 3 www.google.com
