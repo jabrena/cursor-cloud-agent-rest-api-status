@@ -25,6 +25,9 @@
                 traceroute -T -m 64 -w 3 www.marca.com
                 traceroute -T -m 64 -w 3 www.as.com
                 traceroute -T -m 64 -w 3 www.google.com
+                dig @8.8.8.8 www.marca.com
+                nslookup www.marca.com 8.8.8.8
+                strace -e trace=connect curl -v https://www.marca.com 2>&1 | grep -i "connect"
                 ```
                 ]]>
             </step-content>
