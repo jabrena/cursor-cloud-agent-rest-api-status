@@ -4,7 +4,7 @@
 
     <sequence
         model="default" repository="https://github.com/jabrena/cursor-cloud-agent-rest-api-status"
-        timeout="2m" fallback-src="999-fallback.xml">
+        timeout="3m" fallback-src="999-fallback.xml">
         <prompt src="1-pml-internet-test-curl.xml" />
     </sequence>
 </pml-workflow>
