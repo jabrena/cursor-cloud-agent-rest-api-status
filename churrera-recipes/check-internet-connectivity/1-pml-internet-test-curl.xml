@@ -5,6 +5,7 @@
     <goal>
         Check internet connectivity using a curl command
 
+        <![CDATA[ 
         ```bash
         sudo apt update
         sudo apt install -y curl libcurl4
@@ -14,6 +15,7 @@
         cat /etc/resolv.conf
         curl -L https://marca.com | grep "Marca"
         ```
+        ]]>
     </goal>
 
     <output-format>Not explain anything only show the output of the curl command</output-format>
