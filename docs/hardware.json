@@ -1,1 +1,15 @@
-[]
+[
+  {
+    "prompt-execution-ts-start": "20251202112334",
+    "prompt-execution-ts-end": "20251202112353",
+    "prompt-execution-duration": "19 seconds",
+    "aws-region": "us-east-1",
+    "cpu-architecture": "x86_64",
+    "processing-units": "4",
+    "system-information": "Linux cursor 6.1.147 #1 SMP PREEMPT_DYNAMIC Tue Aug  5 21:01:56 UTC 2025 x86_64 x86_64 x86_64 GNU/Linux",
+    "ram-usage-and-total-memory": "total: 15Gi, used: 753Mi, free: 8.7Gi, shared: 1.1Mi, buff/cache: 6.5Gi, available: 14Gi",
+    "disk-space-usage": "Filesystem      Size  Used Avail Use% Mounted on\noverlay         126G  6.6G  113G   6% /\ntmpfs            64M     0   64M   0% /dev\ntmpfs           7.9G     0  7.9G   0% /sys/fs/cgroup\nshm              64M     0   64M   0% /dev/shm\n/dev/root       126G  6.6G  113G   6% /etc/hosts",
+    "java-version": "openjdk version \"21.0.8\" 2025-07-15",
+    "maven-version": "not installed"
+  }
+]
