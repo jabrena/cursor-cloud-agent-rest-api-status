@@ -65,7 +65,7 @@
     <output-format>
         <output-format-list>
             <output-format-item>
-                Replace in the following xml fragment the RESULT with:
+                Replace in the following xml fragment the RESULT with
                 a JSON object with the following fields values:
 
                 <![CDATA[
@@ -76,7 +76,8 @@
                 }
                 ]]>
 
-                Do for all commands.
+                and put RESULT (JSON object) in the result XML fragment:
+                
                 <![CDATA[
                 <result>RESULT</result>
                 ]]>
