@@ -38,6 +38,7 @@
                 # Java and Maven information
                 java -version # Java version
                 mvn -version # Maven version
+                gradle -version # Gradle version
 
                 # Retrieve IP address information
                 curl http://ip-api.com/json/
@@ -51,6 +52,7 @@
                 From the output of the command `df -h` extract the disk space usage and store in variable DISK_SPACE_USAGE
                 From the output of the command `java -version` extract the Java version and store in variable JAVA_VERSION
                 From the output of the command `mvn -version` extract the Maven version and store in variable MAVEN_VERSION
+                From the output of the command `gradle -version` extract the Gradle version and store in variable GRADLE_VERSION
                 From the output of the command `curl http://ip-api.com/json/` extract the field "org" and store it in the variable AWS_REGION
             </step-content>
             <step-constraints>
@@ -91,6 +93,7 @@
                 "disk-space-usage": DISK_SPACE_USAGE,
                 "java-version": JAVA_VERSION,
                 "maven-version": MAVEN_VERSION,
+                "gradle-version": GRADLE_VERSION,
                 }
                 ]]>
 
