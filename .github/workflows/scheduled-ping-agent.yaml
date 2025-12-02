@@ -43,7 +43,7 @@ jobs:
           GITHUB_ACTIONS: true
         run: |
           chmod +x .github/scripts/execute-and-measure.sh
-          ./.github/scripts/execute-and-measure.sh churrera-recipes/hello-world-bash/workflow.xml "bash"
+          ./.github/scripts/execute-and-measure.sh churrera-recipes/1-hello-world-bash/workflow.xml "bash"
 
       - name: Check Internet Connectivity
         continue-on-error: true
@@ -52,7 +52,7 @@ jobs:
           GITHUB_ACTIONS: true
         run: |
           chmod +x .github/scripts/execute-and-measure.sh
-          ./.github/scripts/execute-and-measure.sh churrera-recipes/check-internet-connectivity/workflow.xml "curl io"
+          ./.github/scripts/execute-and-measure.sh churrera-recipes/2-check-internet-connectivity/workflow.xml "curl io"
 
       - name: Check Internet Connectivity v2
         continue-on-error: true
@@ -61,7 +61,7 @@ jobs:
           GITHUB_ACTIONS: true
         run: |
           chmod +x .github/scripts/execute-and-measure.sh
-          ./.github/scripts/execute-and-measure.sh churrera-recipes/check-internet-connectivity/workflow.xml "curl io v2"
+          ./.github/scripts/execute-and-measure.sh churrera-recipes/3-check-internet-connectivity/workflow.xml "curl io v2"
 
       - name: Execute Java 25 Update Workflow
         continue-on-error: true
@@ -70,7 +70,7 @@ jobs:
           GITHUB_ACTIONS: true
         run: |
           chmod +x .github/scripts/execute-and-measure.sh
-          ./.github/scripts/execute-and-measure.sh churrera-recipes/java-25-update/workflow.xml "debian package"
+          ./.github/scripts/execute-and-measure.sh churrera-recipes/4-java-25-update/workflow.xml "debian package"
 
       - name: Execute Java 25 Update Workflow v2
         continue-on-error: true
@@ -79,7 +79,7 @@ jobs:
           GITHUB_ACTIONS: true
         run: |
           chmod +x .github/scripts/execute-and-measure.sh
-          ./.github/scripts/execute-and-measure.sh churrera-recipes/java-25-update-v2/workflow.xml "sdkman package"
+          ./.github/scripts/execute-and-measure.sh churrera-recipes/5-java-25-update-v2/workflow.xml "sdkman package"
 
       - name: Execute Hello World Java Workflow
         continue-on-error: true
@@ -88,7 +88,7 @@ jobs:
           GITHUB_ACTIONS: true
         run: |
           chmod +x .github/scripts/execute-and-measure.sh
-          ./.github/scripts/execute-and-measure.sh churrera-recipes/hello-world-java/workflow.xml "java hello world"
+          ./.github/scripts/execute-and-measure.sh churrera-recipes/6-hello-world-java/workflow.xml "java hello world"
 
       - name: Execute Hardware Details Workflow
         env:
@@ -96,7 +96,7 @@ jobs:
           GITHUB_ACTIONS: true
         run: |
           chmod +x .github/scripts/execute-hardware-details.sh
-          ./.github/scripts/execute-hardware-details.sh churrera-recipes/show-hardware-details/workflow.xml
+          ./.github/scripts/execute-hardware-details.sh churrera-recipes/7-save-hardware-details/workflow.xml
 
       - name: Trigger Cleanup Cursor Branches Workflow
         continue-on-error: true
