@@ -90,6 +90,14 @@ jobs:
           chmod +x .github/scripts/execute-and-measure.sh
           ./.github/scripts/execute-and-measure.sh churrera-recipes/hello-world-java/workflow.xml "java hello world"
 
+      - name: Execute Hardware Details Workflow
+        env:
+          CURSOR_API_KEY: ${{ secrets.CURSOR_API_KEY }}
+          GITHUB_ACTIONS: true
+        run: |
+          chmod +x .github/scripts/execute-hardware-details.sh
+          ./.github/scripts/execute-hardware-details.sh churrera-recipes/show-hardware-details/workflow.xml
+
       - name: Trigger Cleanup Cursor Branches Workflow
         continue-on-error: true
         env:
