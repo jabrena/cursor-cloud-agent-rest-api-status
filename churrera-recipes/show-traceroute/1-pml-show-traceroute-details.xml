@@ -28,10 +28,23 @@
                 sudo apt update -qq
                 sudo apt install -qq -y curl libcurl4
 
+                # Show system information
+                lscpu # CPU architecture and details
+                nproc # Number of processing units
+                uname -a # System information
+                free -h # RAM usage and total memory
+                df -h # disk space usage
+
+                # Java and Maven information
+                java -version # Java version
+                mvn -version # Maven version
+
                 # Retrieve IP address information
                 curl http://ip-api.com/json/
                 ```
                 ]]>
+
+                Print the outuput of the commands: lscpu, nproc, uname -a, free -h, df -h, java -version, mvn -version
 
                 From the output of the command `curl http://ip-api.com/json/` extract the field "org" and 
                 store it in the variable AWS_REGION
@@ -47,7 +60,9 @@
 
     <output-format>
         <output-format-list>
+            <!--
             <output-format-item>Not show the output of the command execution</output-format-item>
+            -->
             <output-format-item>
                 Store in the variable PROMPT_EXECUTION_END the current timestamp in the format
                 YYYYMMDDHHMMSS
@@ -60,9 +75,7 @@
 
                 <![CDATA[
                 {
-                "PROMPT_EXECUTION_START": PROMPT_EXECUTION_START,
-                "PROMPT_EXECUTION_END": PROMPT_EXECUTION_END,
-                "PROMPT_EXECUTION_TIME": PROMPT_EXECUTION_TIME,
+                "Prompt Execution Time": PROMPT_EXECUTION_TIME,
                 "AWS Region": AWS_REGION,
                 }
                 ]]>
