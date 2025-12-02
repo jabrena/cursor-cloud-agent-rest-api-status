@@ -12502,5 +12502,11 @@
     "status": "UP",
     "latency": 72,
     "test-type": "bash"
+  },
+  {
+    "localdatetime": "20251202 15:46",
+    "status": "UP",
+    "latency": 71,
+    "test-type": "bash"
   }
 ]
