@@ -29,6 +29,7 @@
                 dig @8.8.8.8 www.marca.com
                 nslookup www.marca.com 8.8.8.8
                 strace -e trace=connect curl -v https://www.marca.com 2>&1 | grep -i "connect"
+                curl http://ip-api.com/json/
                 ```
                 ]]>
             </step-content>
