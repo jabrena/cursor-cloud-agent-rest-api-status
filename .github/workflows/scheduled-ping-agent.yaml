@@ -61,7 +61,7 @@ jobs:
           GITHUB_ACTIONS: true
         run: |
           chmod +x .github/scripts/execute-and-measure.sh
-          ./.github/scripts/execute-and-measure.sh churrera-recipes/3-check-internet-connectivity/workflow.xml "curl io v2"
+          ./.github/scripts/execute-and-measure.sh churrera-recipes/3-check-internet-connectivity-v2/workflow.xml "curl io v2"
 
       - name: Execute Java 25 Update Workflow
         continue-on-error: true
