@@ -58,6 +58,8 @@
                     <step-constraint>Do not invest time in planning</step-constraint>
                     <step-constraint>Not save results in a file</step-constraint>
                     <step-constraint>Not check maven using Maven Wrapper</step-constraint>
+                    <step-constraint>Simplify the results for `free -h`execution output</step-constraint>
+                    <step-constraint>Not add quotes in the variable JAVA_VERSION after execution of `java -version` </step-constraint>
                 </step-constraint-list>
             </step-constraints>
         </step>
