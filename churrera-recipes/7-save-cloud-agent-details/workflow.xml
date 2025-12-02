@@ -5,6 +5,6 @@
     <sequence
         model="default" repository="https://github.com/jabrena/cursor-cloud-agent-rest-api-status"
         timeout="5m" fallback-src="999-fallback.xml">
-        <prompt src="1-pml-save-hardware-details.xml" />
+        <prompt src="1-pml-save-cloud-agent-details.xml" />
     </sequence>
 </pml-workflow>

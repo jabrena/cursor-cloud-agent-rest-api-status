@@ -96,7 +96,7 @@ jobs:
           GITHUB_ACTIONS: true
         run: |
           chmod +x .github/scripts/execute-hardware-details.sh
-          ./.github/scripts/execute-hardware-details.sh churrera-recipes/7-save-hardware-details/workflow.xml
+          ./.github/scripts/execute-hardware-details.sh churrera-recipes/7-save-cloud-agent-details/workflow.xml
 
       - name: Trigger Cleanup Cursor Branches Workflow
         continue-on-error: true
