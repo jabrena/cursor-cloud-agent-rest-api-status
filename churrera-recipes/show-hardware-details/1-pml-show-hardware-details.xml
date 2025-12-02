@@ -4,7 +4,12 @@
 
     <role>System Administrator with expertise in Java development environments and package management for Linux systems</role>
 
-    <goal>Show the hardware details about the Cursor Cloud Agent. Follow the next step to achieve the goal.</goal>
+    <goal>
+        Store in the variable PROMPT_EXECUTION_START the current timestamp in the format YYYYMMDDHHMMSS
+
+        Show details about a Cursor Cloud Agent execution. 
+        Follow the next step to achieve the goal.
+    </goal>
 
     <steps>
         <step number="1">
@@ -14,63 +19,45 @@
 
                 <![CDATA[ 
                 ```bash
+                # Update DNS
+                sudo sed 's/nameserver 1.1.1.1/nameserver 8.8.8.8/g' /etc/resolv.conf | sudo tee /etc/resolv.conf > /dev/null
+                grep -q "nameserver 8.8.8.8" /etc/resolv.conf || echo "nameserver 8.8.8.8" | sudo tee -a /etc/resolv.conf
+                cat /etc/resolv.conf
+
+                # Install traceroute, curl, jq
+                sudo apt update -qq
+                sudo apt install -qq -y curl libcurl4
+
+                # Show system information
                 lscpu # CPU architecture and details
                 nproc # Number of processing units
                 uname -a # System information
                 free -h # RAM usage and total memory
                 df -h # disk space usage
+
+                # Java and Maven information
                 java -version # Java version
                 mvn -version # Maven version
-                # Cloud Provider Detection (try multiple providers)
-                # AWS Metadata
-                # Try to fetch IMDSv2 token
-                TOKEN=$(curl -s -X PUT "http://169.254.169.254/latest/api/token" -H "X-aws-ec2-metadata-token-ttl-seconds: 21600" --max-time 2 2>/dev/null)
-                if [ -n "$TOKEN" ]; then
-                    H_OPT="-H X-aws-ec2-metadata-token:$TOKEN"
-                else
-                    H_OPT=""
-                fi
 
-                # Check if we can access instance-id (fast check)
-                if curl -s -f --max-time 2 $H_OPT http://169.254.169.254/latest/meta-data/instance-id >/dev/null 2>&1; then
-                    echo "AWS Instance detected:"
-                    
-                    echo -n "Instance Type: "
-                    curl -s --max-time 2 $H_OPT http://169.254.169.254/latest/meta-data/instance-type 2>/dev/null
-                    echo ""
-                    
-                    echo -n "Instance ID: "
-                    curl -s --max-time 2 $H_OPT http://169.254.169.254/latest/meta-data/instance-id 2>/dev/null
-                    echo ""
-                    
-                    echo -n "Availability Zone: "
-                    curl -s --max-time 2 $H_OPT http://169.254.169.254/latest/meta-data/placement/availability-zone 2>/dev/null
-                    echo ""
-                    
-                    echo -n "Region: "
-                    curl -s --max-time 2 $H_OPT http://169.254.169.254/latest/meta-data/placement/region 2>/dev/null
-                    echo ""
-                else
-                    # Fallback DMI check
-                    if grep -q "Amazon" /sys/class/dmi/id/sys_vendor 2>/dev/null; then
-                        echo "AWS Instance detected (Metadata unavailable)"
-                    else
-                        echo "Not AWS or metadata unavailable"
-                    fi
-                fi
-
-                # Azure Metadata
-                curl -s --max-time 2 -H "Metadata:true" http://169.254.169.254/metadata/instance?api-version=2021-02-01 2>/dev/null | head -c 200 || echo "Not Azure or metadata unavailable"
-
-                # GCP Metadata
-                curl -s --max-time 2 -H "Metadata-Flavor: Google" http://169.254.169.254/computeMetadata/v1/instance/machine-type 2>/dev/null || echo "Not GCP or metadata unavailable"
+                # Retrieve IP address information
+                curl http://ip-api.com/json/
                 ```
                 ]]>
+
+                From the output of the command `lscpu` extract the information about the CPU architecture an store in variable CPU_ARCHITECTURE
+                From the output of the command `nproc` extract the number of processing units and store in variable NUMBER_OF_PROCESSING_UNITS
+                From the output of the command `uname -a` extract the full ouput and store in variable SYSTEM_INFORMATION
+                From the output of the command `free -h` extract the RAM usage and total memory and store in variable RAM_USAGE_AND_TOTAL_MEMORY
+                From the output of the command `df -h` extract the disk space usage and store in variable DISK_SPACE_USAGE
+                From the output of the command `java -version` extract the Java version and store in variable JAVA_VERSION
+                From the output of the command `mvn -version` extract the Maven version and store in variable MAVEN_VERSION
+                From the output of the command `curl http://ip-api.com/json/` extract the field "org" and store it in the variable AWS_REGION
             </step-content>
             <step-constraints>
                 <step-constraint-list>
                     <step-constraint>Do not invest time in planning</step-constraint>
                     <step-constraint>Not save results in a file</step-constraint>
+                    <step-constraint>Not check maven using Maven Wrapper</step-constraint>
                 </step-constraint-list>
             </step-constraints>
         </step>
@@ -78,13 +65,32 @@
 
     <output-format>
         <output-format-list>
-            <output-format-item>Show the output of the commands</output-format-item>
-            <output-format-item>Replace in the following xml fragment the RESULT with:
-                Comand: the command used + return 2 new lines +
-                result of the execution of the commands. 
-                
-                After every execution add a new line 
-                and "--------------------------------" as a separator.
+            <output-format-item>Not show the output of the command execution</output-format-item>
+            <output-format-item>
+                Store in the variable PROMPT_EXECUTION_END the current timestamp in the format
+                YYYYMMDDHHMMSS
+                Calculate in seconds the difference between PROMPT_EXECUTION_START and PROMPT_EXECUTION_END
+                and store it in the variable PROMPT_EXECUTION_TIME
+                add a suffix " seconds" to the variable PROMPT_EXECUTION_TIME
+
+                Replace in the following xml fragment the RESULT with:
+                a JSON object with the following fields:
+
+                <![CDATA[
+                {
+                "prompt-execution-ts-start": PROMPT_EXECUTION_START,
+                "prompt-execution-ts-end": PROMPT_EXECUTION_END,
+                "prompt-execution-duration": PROMPT_EXECUTION_TIME,
+                "aws-region": AWS_REGION,
+                "cpu-architecture": CPU_ARCHITECTURE,
+                "processing-units": NUMBER_OF_PROCESSING_UNITS,
+                "system-information": SYSTEM_INFORMATION,
+                "ram-usage-and-total-memory": RAM_USAGE_AND_TOTAL_MEMORY,
+                "disk-space-usage": DISK_SPACE_USAGE,
+                "java-version": JAVA_VERSION,
+                "maven-version": MAVEN_VERSION,
+                }
+                ]]>
 
                 Do for all commands.
                 <![CDATA[
@@ -97,6 +103,7 @@
     <acceptance-criteria>
         <acceptance-criteria-list>
             <acceptance-criteria-item>The output is in the correct format</acceptance-criteria-item>
+            <acceptance-criteria-item>Print the XML result fragment with the final result of RESULT</acceptance-criteria-item>
         </acceptance-criteria-list>
     </acceptance-criteria>
 </prompt>
