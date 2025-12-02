@@ -10,16 +10,24 @@
         <step number="1">
             <step-title>Install Java 25 using a debian package</step-title>
             <step-content>
+                <![CDATA[ 
                 ```bash
+                # Update DNS
+                sudo sed 's/nameserver 1.1.1.1/nameserver 8.8.8.8/g' /etc/resolv.conf | sudo tee /etc/resolv.conf > /dev/null
+                grep -q "nameserver 8.8.8.8" /etc/resolv.conf || echo "nameserver 8.8.8.8" | sudo tee -a /etc/resolv.conf
+                cat /etc/resolv.conf
+
+                # Install Java 25
                 sudo apt update
                 sudo apt install -y openjdk-25-jdk
                 java -version
                 ```
+                ]]>
             </step-content>
             <step-constraints>
                 <step-constraint-list>
                     <step-constraint>Do not invest time in planning</step-constraint>
-                    <step-constraint>Only install the component with the given command</step-constraint>
+                    <step-constraint>Only install the component with the commands provided</step-constraint>
                 </step-constraint-list>
             </step-constraints>
         </step>
