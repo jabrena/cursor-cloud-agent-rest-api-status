@@ -34,51 +34,17 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y jq
 
-      - name: Execute PML Worflow with Churrera
+      - name: Retrieve Churrera Models
+        env:
+          CURSOR_API_KEY: ${{ secrets.CURSOR_API_KEY }}
+        run: |
+          jbang trust add https://github.com/jabrena/
+          jbang churrera@jabrena run --retrieve-models
+
+      - name: Execute Hardware Details Workflow
         env:
           CURSOR_API_KEY: ${{ secrets.CURSOR_API_KEY }}
           GITHUB_ACTIONS: true
         run: |
-          jbang trust add https://github.com/jabrena/
-          jbang churrera@jabrena run --retrieve-models
-          chmod +x .github/scripts/extract-result-json.sh
-          # Fetch and pull latest changes before reading hardware.json to avoid conflicts
-          # when running multiple times in sequence
-          if [ -n "$GITHUB_ACTIONS" ]; then
-            git config --local user.email "action@github.com"
-            git config --local user.name "GitHub Action"
-            git fetch origin main
-            git pull origin main --no-edit || echo "Pull failed or no changes to merge"
-          fi
-          # Run churrera and capture output
-          OUTPUT_FILE=$(mktemp)
-          jbang churrera@jabrena run --workflow churrera-recipes/show-hardware-details/workflow.xml \
-            --show-logs --delete-on-success-completion > "$OUTPUT_FILE" 2>&1
-          # Display the output (logs will appear in GitHub Actions)
-          cat "$OUTPUT_FILE"
-          # Extract JSON from the output to a temporary file
-          NEW_JSON_FILE=$(mktemp)
-          cat "$OUTPUT_FILE" | ./.github/scripts/extract-result-json.sh > "$NEW_JSON_FILE"
-          # Ensure hardware.json exists and is a valid JSON array
-          if [ ! -f docs/hardware.json ] || [ ! -s docs/hardware.json ]; then
-            echo "[]" > docs/hardware.json
-          fi
-          # Append the new JSON object to the existing array
-          jq --argjson new "$(cat "$NEW_JSON_FILE")" '. + [$new]' docs/hardware.json > docs/hardware.json.tmp && mv docs/hardware.json.tmp docs/hardware.json
-          echo ""
-          echo "=== Extracted JSON ==="
-          cat "$NEW_JSON_FILE"
-          echo ""
-          echo "=== Updated hardware.json ==="
-          cat docs/hardware.json
-          rm "$OUTPUT_FILE" "$NEW_JSON_FILE"
-          # Commit and push hardware.json if running in CI environment
-          if [ -n "$GITHUB_ACTIONS" ]; then
-            git add docs/hardware.json
-            if git diff --staged --quiet; then
-              echo "No changes to commit"
-            else
-              git commit -m "Update hardware.json with execution hardware details [skip ci]"
-              git push origin main
-            fi
-          fi
+          chmod +x .github/scripts/execute-hardware-details.sh
+          ./.github/scripts/execute-hardware-details.sh churrera-recipes/show-hardware-details/workflow.xml
