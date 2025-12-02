@@ -4,7 +4,12 @@
 
     <role>System Administrator with expertise in Java development environments and package management for Linux systems</role>
 
-    <goal>Show network details about the Cursor Cloud Agent. Follow the next step to achieve the goal.</goal>
+    <goal>
+        Store in the variable PROMPT_EXECUTION_START the current timestamp in the format YYYYMMDDHHMMSS
+
+        Show details about a Cursor Cloud Agent execution. 
+        Follow the next step to achieve the goal.
+    </goal>
 
     <steps>
         <step number="1">
@@ -43,11 +48,20 @@
     <output-format>
         <output-format-list>
             <output-format-item>Not show the output of the command execution</output-format-item>
-            <output-format-item>Replace in the following xml fragment the RESULT with:
+            <output-format-item>
+                Store in the variable PROMPT_EXECUTION_END the current timestamp in the format
+                YYYYMMDDHHMMSS
+                Calculate in seconds the difference between PROMPT_EXECUTION_START and PROMPT_EXECUTION_END
+                and store it in the variable PROMPT_EXECUTION_TIME
+
+                Replace in the following xml fragment the RESULT with:
                 a JSON object with the following fields:
 
                 <![CDATA[
                 {
+                "PROMPT_EXECUTION_START": PROMPT_EXECUTION_START,
+                "PROMPT_EXECUTION_END": PROMPT_EXECUTION_END,
+                "PROMPT_EXECUTION_TIME": PROMPT_EXECUTION_TIME,
                 "AWS Region": AWS_REGION,
                 }
                 ]]>
