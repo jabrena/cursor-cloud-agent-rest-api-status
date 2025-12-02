@@ -13,7 +13,6 @@
 
     <output-format>
         <output-format-list>
-            <output-format-item>Not explain anything and show any output</output-format-item>
             <output-format-item>
                 Store in the variable PROMPT_EXECUTION_END the current timestamp in the format
                 YYYYMMDDHHMMSS
