@@ -20,13 +20,16 @@
                 cat /etc/resolv.conf
 
                 # Install traceroute, curl, jq
-                sudo apt update
+                sudo apt update -qq
                 sudo apt install -qq -y curl libcurl4
 
-                # Test internet connectivity
+                # Retrieve IP address information
                 curl http://ip-api.com/json/
                 ```
                 ]]>
+
+                From the output of the command `curl http://ip-api.com/json/` extract the field "org" and 
+                store it in the variable AWS_REGION
             </step-content>
             <step-constraints>
                 <step-constraint-list>
@@ -39,13 +42,15 @@
 
     <output-format>
         <output-format-list>
-            <output-format-item>Show the output of the commands</output-format-item>
+            <output-format-item>Not show the output of the command execution</output-format-item>
             <output-format-item>Replace in the following xml fragment the RESULT with:
-                Comand: the command used + return 2 new lines +
-                result of the execution of the commands. 
-                
-                After every execution add a new line 
-                and "--------------------------------" as a separator.
+                a JSON object with the following fields:
+
+                <![CDATA[
+                {
+                "AWS Region": AWS_REGION,
+                }
+                ]]>
 
                 Do for all commands.
                 <![CDATA[
