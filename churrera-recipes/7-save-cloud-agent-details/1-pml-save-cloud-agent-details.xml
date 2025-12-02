@@ -93,7 +93,7 @@
                 "disk-space-usage": DISK_SPACE_USAGE,
                 "java-version": JAVA_VERSION,
                 "maven-version": MAVEN_VERSION,
-                "gradle-version": GRADLE_VERSION,
+                "gradle-version": GRADLE_VERSION
                 }
                 ]]>
 

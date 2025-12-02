@@ -24,7 +24,7 @@ START_TIME=$(date +%s)
 jbang trust add https://github.com/jabrena/
 # Temporarily disable exit on error to handle timeout gracefully
 set +e
-timeout 300 jbang churrera@jabrena run --workflow "$WORKFLOW_FILE" --delete-on-success-completion
+timeout 300 jbang churrera@jabrena run --workflow "$WORKFLOW_FILE" --show-logs --delete-on-success-completion
 EXIT_CODE=$?
 set -e
 
