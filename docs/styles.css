@@ -267,6 +267,56 @@ footer a:hover {
     color: #47b881;
 }
 
+.hardware-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+
+.hardware-table th {
+    background-color: #f8f9fa;
+    padding: 12px;
+    text-align: left;
+    font-weight: 600;
+    color: #333;
+    border-bottom: 2px solid #e0e0e0;
+}
+
+.hardware-table th[colspan="2"] {
+    text-align: center;
+    background-color: #e9ecef;
+    font-size: 16px;
+    padding: 15px;
+}
+
+.hardware-table td {
+    padding: 12px;
+    border-bottom: 1px solid #e0e0e0;
+    color: #555;
+}
+
+.hardware-table tr:last-child td {
+    border-bottom: none;
+}
+
+.hardware-table tr:hover {
+    background-color: #f8f9fa;
+}
+
+.hardware-table td:first-child {
+    font-weight: 500;
+    width: 40%;
+    color: #333;
+}
+
+.hardware-table pre {
+    margin: 0;
+    font-family: 'Courier New', monospace;
+    font-size: 12px;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+}
+
 @media (max-width: 768px) {
     .header-content {
         flex-direction: column;
@@ -280,6 +330,19 @@ footer a:hover {
     .status-legend {
         flex-direction: column;
         gap: 15px;
+    }
+
+    .hardware-table {
+        font-size: 14px;
+    }
+
+    .hardware-table th,
+    .hardware-table td {
+        padding: 8px;
+    }
+
+    .hardware-table td:first-child {
+        width: 35%;
     }
 }
 
