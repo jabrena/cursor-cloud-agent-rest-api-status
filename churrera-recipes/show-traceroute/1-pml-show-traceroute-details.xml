@@ -64,9 +64,7 @@
 
     <output-format>
         <output-format-list>
-            <!--
             <output-format-item>Not show the output of the command execution</output-format-item>
-            -->
             <output-format-item>
                 Store in the variable PROMPT_EXECUTION_END the current timestamp in the format
                 YYYYMMDDHHMMSS
@@ -102,6 +100,7 @@
     <acceptance-criteria>
         <acceptance-criteria-list>
             <acceptance-criteria-item>The output is in the correct format</acceptance-criteria-item>
+            <acceptance-criteria-item>Print the XML result fragment with the final result of RESULT</acceptance-criteria-item>
         </acceptance-criteria-list>
     </acceptance-criteria>
 </prompt>
