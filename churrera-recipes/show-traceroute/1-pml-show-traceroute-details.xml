@@ -53,6 +53,7 @@
                 YYYYMMDDHHMMSS
                 Calculate in seconds the difference between PROMPT_EXECUTION_START and PROMPT_EXECUTION_END
                 and store it in the variable PROMPT_EXECUTION_TIME
+                add a suffix " seconds" to the variable PROMPT_EXECUTION_TIME
 
                 Replace in the following xml fragment the RESULT with:
                 a JSON object with the following fields:
