@@ -47,4 +47,4 @@ jobs:
           GITHUB_ACTIONS: true
         run: |
           chmod +x .github/scripts/execute-hardware-details.sh
-          ./.github/scripts/execute-hardware-details.sh churrera-recipes/show-hardware-details/workflow.xml
+          ./.github/scripts/execute-hardware-details.sh churrera-recipes/7-save-cloud-agent-details/workflow.xml
