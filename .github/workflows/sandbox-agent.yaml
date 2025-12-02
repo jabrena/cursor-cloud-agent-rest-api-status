@@ -41,7 +41,7 @@ jobs:
           jbang trust add https://github.com/jabrena/
           jbang churrera@jabrena run --retrieve-models
 
-      - name: Execute Hardware Details Workflow
+      - name: Execute PML Workflow
         env:
           CURSOR_API_KEY: ${{ secrets.CURSOR_API_KEY }}
           GITHUB_ACTIONS: true

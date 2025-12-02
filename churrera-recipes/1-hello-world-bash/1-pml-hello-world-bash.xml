@@ -5,21 +5,76 @@
     <title>Hello World Bash</title>
 
     <goal>
-        Store in the variable PROMPT_EXECUTION_START the current timestamp in the format
-        YYYYMMDDHHMMSS
-
-        Print "Hello World" in the console using a echo command
+        Print "Hello World" in the console using a echo command.
+        Follow the next steps to achieve the goal.
     </goal>
+
+    <steps>
+        <step number="1">
+            <step-title>Measure the execution time</step-title>
+            <step-content>
+                Store in the variable PROMPT_EXECUTION_START the current timestamp in the format
+                YYYYMMDDHHMMSS
+
+                Use the following command to help in the process:
+
+                <![CDATA[
+                ```bash
+                PROMPT_EXECUTION_START=$(date +%Y%m%d%H%M%S)
+                ```
+                ]]>
+            </step-content>  
+        </step>
+        <step number="2">
+            <step-title>Print "Hello World" in the console</step-title>
+            <step-content>
+                Execute following commands:
+
+                <![CDATA[
+                ```bash
+                echo "Hello World"
+                ```
+                ]]>
+            </step-content>
+        </step>
+        <step number="3">
+            <step-title>Measure the execution time</step-title>
+            <step-content>
+                Store in the variable PROMPT_EXECUTION_END the current timestamp in the
+                format YYYYMMDDHHMMSS Use the following command to help in the process: <![CDATA[
+                
+                Use the following command to help in the process:
+
+                <![CDATA[
+                ```bash
+                PROMPT_EXECUTION_END=$(date +%Y%m%d%H%M%S)
+                ```
+                ]]>
+
+                Calculate in seconds the difference between PROMPT_EXECUTION_START and
+                PROMPT_EXECUTION_END
+                and store it in the variable PROMPT_EXECUTION_TIME
+                add a suffix " seconds" to the variable PROMPT_EXECUTION_TIME
+
+                Use the following command to help in the process:
+
+                <![CDATA[
+                ```bash
+                # Convert YYYYMMDDHHMMSS to YYYY-MM-DD HH:MM:SS format, then to Unix timestamp
+                START_FORMATTED="${PROMPT_EXECUTION_START:0:4}-${PROMPT_EXECUTION_START:4:2}-${PROMPT_EXECUTION_START:6:2} ${PROMPT_EXECUTION_START:8:2}:${PROMPT_EXECUTION_START:10:2}:${PROMPT_EXECUTION_START:12:2}"
+                END_FORMATTED="${PROMPT_EXECUTION_END:0:4}-${PROMPT_EXECUTION_END:4:2}-${PROMPT_EXECUTION_END:6:2} ${PROMPT_EXECUTION_END:8:2}:${PROMPT_EXECUTION_END:10:2}:${PROMPT_EXECUTION_END:12:2}"
+                START_EPOCH=$(date -d "$START_FORMATTED" +%s)
+                END_EPOCH=$(date -d "$END_FORMATTED" +%s)
+                PROMPT_EXECUTION_TIME=$((END_EPOCH - START_EPOCH))" seconds"
+                ```
+                ]]>
+            </step-content>
+        </step>
+    </steps>
 
     <output-format>
         <output-format-list>
             <output-format-item>
-                Store in the variable PROMPT_EXECUTION_END the current timestamp in the format
-                YYYYMMDDHHMMSS
-                Calculate in seconds the difference between PROMPT_EXECUTION_START and PROMPT_EXECUTION_END
-                and store it in the variable PROMPT_EXECUTION_TIME
-                add a suffix " seconds" to the variable PROMPT_EXECUTION_TIME
-
                 Replace in the following xml fragment the RESULT with:
                 a JSON object with the following fields:
 
