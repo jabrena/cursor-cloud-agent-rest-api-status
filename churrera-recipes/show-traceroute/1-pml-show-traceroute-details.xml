@@ -44,10 +44,14 @@
                 ```
                 ]]>
 
-                Print the outuput of the commands: lscpu, nproc, uname -a, free -h, df -h, java -version, mvn -version
-
-                From the output of the command `curl http://ip-api.com/json/` extract the field "org" and 
-                store it in the variable AWS_REGION
+                From the output of the command `lscpu` extract the information about the CPU architecture an store in variable CPU_ARCHITECTURE
+                From the output of the command `nproc` extract the number of processing units and store in variable NUMBER_OF_PROCESSING_UNITS
+                From the output of the command `uname -a` extract the full ouput and store in variable SYSTEM_INFORMATION
+                From the output of the command `free -h` extract the RAM usage and total memory and store in variable RAM_USAGE_AND_TOTAL_MEMORY
+                From the output of the command `df -h` extract the disk space usage and store in variable DISK_SPACE_USAGE
+                From the output of the command `java -version` extract the Java version and store in variable JAVA_VERSION
+                From the output of the command `mvn -version` extract the Maven version and store in variable MAVEN_VERSION
+                From the output of the command `curl http://ip-api.com/json/` extract the field "org" and store it in the variable AWS_REGION
             </step-content>
             <step-constraints>
                 <step-constraint-list>
@@ -77,6 +81,13 @@
                 {
                 "Prompt Execution Time": PROMPT_EXECUTION_TIME,
                 "AWS Region": AWS_REGION,
+                "CPU Architecture": CPU_ARCHITECTURE,
+                "Number of Processing Units": NUMBER_OF_PROCESSING_UNITS,
+                "System Information": SYSTEM_INFORMATION,
+                "RAM Usage and Total Memory": RAM_USAGE_AND_TOTAL_MEMORY,
+                "Disk Space Usage": DISK_SPACE_USAGE,
+                "Java Version": JAVA_VERSION,
+                "Maven Version": MAVEN_VERSION,
                 }
                 ]]>
 
