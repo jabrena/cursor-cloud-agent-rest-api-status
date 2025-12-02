@@ -16,7 +16,7 @@
                 Store in the variable PROMPT_EXECUTION_START the current timestamp in the format
                 YYYYMMDDHHMMSS
 
-                Use the following command to help in the process:
+                Execute the following command to create the variable PROMPT_EXECUTION_START:
 
                 <![CDATA[
                 ```bash
@@ -28,7 +28,7 @@
         <step number="2">
             <step-title>Print "Hello World" in the console</step-title>
             <step-content>
-                Execute following commands:
+                Execute the following command to print "Hello World" in the console:
 
                 <![CDATA[
                 ```bash
@@ -43,7 +43,7 @@
                 Store in the variable PROMPT_EXECUTION_END the current timestamp in the
                 format YYYYMMDDHHMMSS Use the following command to help in the process: <![CDATA[
                 
-                Use the following command to help in the process:
+                Execute the following command to create the variable PROMPT_EXECUTION_END:
 
                 <![CDATA[
                 ```bash
@@ -56,7 +56,7 @@
                 and store it in the variable PROMPT_EXECUTION_TIME
                 add a suffix " seconds" to the variable PROMPT_EXECUTION_TIME
 
-                Use the following command to help in the process:
+                Execute the following commands to create the variable PROMPT_EXECUTION_TIME:
 
                 <![CDATA[
                 ```bash
@@ -76,7 +76,7 @@
         <output-format-list>
             <output-format-item>
                 Replace in the following xml fragment the RESULT with:
-                a JSON object with the following fields:
+                a JSON object with the following fields values:
 
                 <![CDATA[
                 {
@@ -93,6 +93,14 @@
             </output-format-item>
         </output-format-list>
     </output-format>
+
+    <safeguards>
+        <safeguards-list>
+            <safeguards-item>Only use the commands provided to achieve the goal</safeguards-item>
+            <safeguards-item>Only use the variables provided to achieve the goal</safeguards-item>
+            <safeguards-item>Not create any script file</safeguards-item>
+        </safeguards-list>
+    </safeguards>
 
     <acceptance-criteria>
         <acceptance-criteria-list>
