@@ -154,12 +154,18 @@ function aggregateLatencyByHourAndType(measures) {
             date: hourData.date
         });
 
-        // Calculate average latency for each test-type in this hour
+        // Calculate latency for each test-type in this hour (use last measure's latency)
         result.testTypes.forEach(testType => {
             const typeMeasures = hourData.measures.filter(m => m['test-type'] === testType && m.status === 'UP');
             if (typeMeasures.length > 0) {
-                const avgLatency = typeMeasures.reduce((sum, m) => sum + m.latency, 0) / typeMeasures.length;
-                result.data[testType].push(avgLatency);
+                // Sort measures by time (ascending) and take the last one (most recent)
+                typeMeasures.sort((a, b) => {
+                    const dateA = parseDateTime(a.localdatetime);
+                    const dateB = parseDateTime(b.localdatetime);
+                    return dateA - dateB;
+                });
+                const lastMeasure = typeMeasures[typeMeasures.length - 1];
+                result.data[testType].push(lastMeasure.latency);
             } else {
                 result.data[testType].push(null); // No data for this hour/test-type combination
             }
