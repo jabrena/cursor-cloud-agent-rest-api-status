@@ -77,15 +77,15 @@
 
                 <![CDATA[
                 {
-                "Prompt Execution Time": PROMPT_EXECUTION_TIME,
-                "AWS Region": AWS_REGION,
-                "CPU Architecture": CPU_ARCHITECTURE,
-                "Number of Processing Units": NUMBER_OF_PROCESSING_UNITS,
-                "System Information": SYSTEM_INFORMATION,
-                "RAM Usage and Total Memory": RAM_USAGE_AND_TOTAL_MEMORY,
-                "Disk Space Usage": DISK_SPACE_USAGE,
-                "Java Version": JAVA_VERSION,
-                "Maven Version": MAVEN_VERSION,
+                "prompt-execution-time": PROMPT_EXECUTION_TIME,
+                "aws-region": AWS_REGION,
+                "cpu-architecture": CPU_ARCHITECTURE,
+                "processing-units": NUMBER_OF_PROCESSING_UNITS,
+                "system-information": SYSTEM_INFORMATION,
+                "ram-usage-and-total-memory": RAM_USAGE_AND_TOTAL_MEMORY,
+                "disk-space-usage": DISK_SPACE_USAGE,
+                "java-version": JAVA_VERSION,
+                "maven-version": MAVEN_VERSION,
                 }
                 ]]>
 
