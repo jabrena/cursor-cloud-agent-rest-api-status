@@ -66,19 +66,29 @@ LOCAL_DATETIME=$(date +"%Y%m%d %H:%M")
 # Extract cursor-latency from churrera output
 CURSOR_LATENCY=""
 if [ -f "$OUTPUT_FILE" ]; then
+    # Get the script directory to ensure we can find extract-result-json.sh
+    SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+    EXTRACT_SCRIPT="$SCRIPT_DIR/extract-result-json.sh"
+    
     # Try to extract JSON from result tags
     set +e  # Temporarily disable exit on error for extraction
-    EXTRACTED_JSON=$(cat "$OUTPUT_FILE" | ./.github/scripts/extract-result-json.sh 2>/dev/null || echo "")
+    # Capture stdout and stderr separately - we only want stdout for JSON
+    EXTRACTED_JSON=$(cat "$OUTPUT_FILE" | "$EXTRACT_SCRIPT" 2>/dev/null)
+    EXTRACT_EXIT_CODE=$?
     set -e
-    if [ -n "$EXTRACTED_JSON" ]; then
-        # Extract prompt-execution-duration value and parse the numeric part
-        # Format is typically: "22 seconds" or just a number
-        set +e  # Temporarily disable exit on error for jq parsing
-        PROMPT_DURATION=$(echo "$EXTRACTED_JSON" | jq -r '.prompt-execution-duration // empty' 2>/dev/null || echo "")
-        set -e
-        if [ -n "$PROMPT_DURATION" ]; then
-            # Extract numeric value (e.g., "22 seconds" -> 22)
-            CURSOR_LATENCY=$(echo "$PROMPT_DURATION" | grep -oE '[0-9]+' | head -1 || echo "")
+    
+    if [ $EXTRACT_EXIT_CODE -eq 0 ] && [ -n "$EXTRACTED_JSON" ]; then
+        # Validate that we got JSON (should start with { and be valid JSON)
+        if echo "$EXTRACTED_JSON" | grep -q '^{' && echo "$EXTRACTED_JSON" | jq empty 2>/dev/null; then
+            # Extract prompt-execution-duration value and parse the numeric part
+            # Format is typically: "22 seconds" or just a number
+            set +e  # Temporarily disable exit on error for jq parsing
+            PROMPT_DURATION=$(echo "$EXTRACTED_JSON" | jq -r '.prompt-execution-duration // empty' 2>/dev/null || echo "")
+            set -e
+            if [ -n "$PROMPT_DURATION" ] && [ "$PROMPT_DURATION" != "null" ] && [ "$PROMPT_DURATION" != "empty" ]; then
+                # Extract numeric value (e.g., "22 seconds" -> 22, "2096 seconds" -> 2096)
+                CURSOR_LATENCY=$(echo "$PROMPT_DURATION" | grep -oE '[0-9]+' | head -1 || echo "")
+            fi
         fi
     fi
 fi
