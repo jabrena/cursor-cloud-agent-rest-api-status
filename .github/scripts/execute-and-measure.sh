@@ -103,9 +103,43 @@ if [ -f "$OUTPUT_FILE" ]; then
                     echo "JSON is valid"
                     # Extract prompt-execution-duration value and parse the numeric part
                     # Format is typically: "22 seconds" or just a number
-                    PROMPT_DURATION=$(echo "$EXTRACTED_JSON" | jq -r '.prompt-execution-duration // empty' 2>/dev/null || echo "")
+                    # Capture both stdout and stderr separately to debug
+                    
+                    # Debug: try to see all keys in JSON
+                    echo "Available JSON keys: $(echo "$EXTRACTED_JSON" | jq -r 'keys | join(", ")' 2>/dev/null || echo "failed to get keys")"
+                    
+                    # Try multiple extraction methods to find what works
+                    TEST1_ERROR_FILE=$(mktemp)
+                    TEST1=$(echo "$EXTRACTED_JSON" | jq -r '.prompt-execution-duration' 2>"$TEST1_ERROR_FILE")
+                    TEST1_EXIT=$?
+                    TEST1_ERROR=$(cat "$TEST1_ERROR_FILE" 2>/dev/null || echo "")
+                    rm -f "$TEST1_ERROR_FILE"
+                    
+                    TEST2_ERROR_FILE=$(mktemp)
+                    TEST2=$(echo "$EXTRACTED_JSON" | jq -r '.["prompt-execution-duration"]' 2>"$TEST2_ERROR_FILE")
+                    TEST2_EXIT=$?
+                    TEST2_ERROR=$(cat "$TEST2_ERROR_FILE" 2>/dev/null || echo "")
+                    rm -f "$TEST2_ERROR_FILE"
+                    
+                    echo "Test 1 (direct): exit=$TEST1_EXIT, value='$TEST1', error='$TEST1_ERROR'"
+                    echo "Test 2 (bracket): exit=$TEST2_EXIT, value='$TEST2', error='$TEST2_ERROR'"
+                    
+                    # Use the first method that works
+                    PROMPT_DURATION=""
+                    if [ $TEST1_EXIT -eq 0 ] && [ -n "$TEST1" ] && [ "$TEST1" != "null" ]; then
+                        PROMPT_DURATION="$TEST1"
+                        echo "Using Test 1 result: '$PROMPT_DURATION'"
+                    elif [ $TEST2_EXIT -eq 0 ] && [ -n "$TEST2" ] && [ "$TEST2" != "null" ]; then
+                        PROMPT_DURATION="$TEST2"
+                        echo "Using Test 2 result: '$PROMPT_DURATION'"
+                    else
+                        echo "Warning: Both extraction methods failed or returned null/empty"
+                    fi
+                    
                     set -e
-                    echo "prompt-execution-duration value: '$PROMPT_DURATION'"
+                    
+                    echo "Final prompt-execution-duration value: '$PROMPT_DURATION'"
+                    echo "prompt-execution-duration length: ${#PROMPT_DURATION}"
                     
                     if [ -n "$PROMPT_DURATION" ] && [ "$PROMPT_DURATION" != "null" ] && [ "$PROMPT_DURATION" != "empty" ]; then
                         # Extract numeric value (e.g., "22 seconds" -> 22, "2096 seconds" -> 2096)
@@ -113,6 +147,10 @@ if [ -f "$OUTPUT_FILE" ]; then
                         echo "Extracted cursor-latency: '$CURSOR_LATENCY'"
                     else
                         echo "Warning: prompt-execution-duration is empty, null, or not found in JSON"
+                        # Try alternative extraction methods
+                        echo "Trying alternative extraction method..."
+                        ALT_DURATION=$(echo "$EXTRACTED_JSON" | jq -r '.["prompt-execution-duration"]' 2>/dev/null || echo "")
+                        echo "Alternative extraction result: '$ALT_DURATION'"
                     fi
                 else
                     set -e
