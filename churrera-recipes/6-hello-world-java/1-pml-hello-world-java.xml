@@ -1,25 +1,105 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<prompt>
+<prompt xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:noNamespaceSchemaLocation="https://jabrena.github.io/pml/schemas/0.3.0/pml.xsd">
+
     <title>Develop a HelloWorld Java Class program</title>
 
     <role>You are a Senior software engineer with extensive experience in Java software development</role>
 
     <goal>Develop a classic Java class HelloWorld.java program
-        that print "Hello World" in the console only</goal>
+        that print "Hello World" in the console only,
+        Follow the next steps to achieve the goal.
+    </goal>
 
-    <constraints>
-        <constraint-list>
-            <constraint>Develop the class in the Maven module `sandbox`</constraint>
-            <constraint>Develop the class in the package info.jab.examples</constraint>
-            <constraint>Don't invest time in planning</constraint>
-            <constraint>Don't create any test class</constraint>
-            <constraint>Don't touch the build file (pom.xml)</constraint>
-        </constraint-list>
-    </constraints>
+    <steps>
+        <step number="1">
+            <step-title>Measure the execution time</step-title>
+            <step-content> Store in the variable PROMPT_EXECUTION_START the current timestamp in the
+                format YYYYMMDDHHMMSS Execute the following command to create the variable
+                PROMPT_EXECUTION_START: <![CDATA[
+                    ```bash
+                    export PROMPT_EXECUTION_START=$(date +%Y%m%d%H%M%S)
+                    echo "$PROMPT_EXECUTION_START" > /tmp/prompt_execution_start.txt
+                    ```
+                    ]]>
+                </step-content>
+        </step>
+        <step number="2">
+            <step-title>Develop the HelloWorld Java Class program</step-title>
+            <step-content>
+                <![CDATA[
+                ```bash
+                ```
+                ]]>
+            </step-content>
+            <step-constraints>
+                <step-constraint-list>
+                    <step-constraint>Develop the class in the Maven module `sandbox`</step-constraint>
+                    <step-constraint>Develop the class in the package info.jab.examples</step-constraint>
+                    <step-constraint>Don't invest time in planning</step-constraint>
+                    <step-constraint>Don't create any test class</step-constraint>
+                    <step-constraint>Don't touch the build file (pom.xml)</step-constraint>
+                </step-constraint-list>
+            </step-constraints>
+        </step>
+        <step number="3">
+            <step-title>Measure the execution time</step-title>
+            <step-content> Store in the variable PROMPT_EXECUTION_END the current timestamp in the
+                format YYYYMMDDHHMMSS Use the following command to help in the process: <![CDATA[
+                
+                Calculate in seconds the difference between PROMPT_EXECUTION_START and
+                PROMPT_EXECUTION_END
+                and store it in the variable PROMPT_EXECUTION_TIME
+                add a suffix " seconds" to the variable PROMPT_EXECUTION_TIME
 
-    <output-format>Don't explain anything</output-format>
+                Execute the following commands to create the variable PROMPT_EXECUTION_TIME:
 
-    <safeguards>Build the solution with Maven Only</safeguards>
+                <![CDATA[
+                ```bash
+                PROMPT_EXECUTION_START=$(cat /tmp/prompt_execution_start.txt)
+                PROMPT_EXECUTION_END=$(date +%Y%m%d%H%M%S)
+                
+                # Convert YYYYMMDDHHMMSS to YYYY-MM-DD HH:MM:SS format, then to Unix timestamp
+                START_FORMATTED="${PROMPT_EXECUTION_START:0:4}-${PROMPT_EXECUTION_START:4:2}-${PROMPT_EXECUTION_START:6:2} ${PROMPT_EXECUTION_START:8:2}:${PROMPT_EXECUTION_START:10:2}:${PROMPT_EXECUTION_START:12:2}"
+                END_FORMATTED="${PROMPT_EXECUTION_END:0:4}-${PROMPT_EXECUTION_END:4:2}-${PROMPT_EXECUTION_END:6:2} ${PROMPT_EXECUTION_END:8:2}:${PROMPT_EXECUTION_END:10:2}:${PROMPT_EXECUTION_END:12:2}"
+                START_EPOCH=$(date -d "$START_FORMATTED" +%s)
+                END_EPOCH=$(date -d "$END_FORMATTED" +%s)
+                PROMPT_EXECUTION_TIME=$((END_EPOCH - START_EPOCH))" seconds"
+                ```
+                ]]>
+            </step-content>
+        </step>        
+    </steps>
+
+    <output-format>
+        <output-format-list>
+            <output-format-item>
+                Replace in the following xml fragment the RESULT with
+                a JSON object with the following fields values:
+
+            <![CDATA[
+                {
+                "prompt-execution-ts-start": PROMPT_EXECUTION_START,
+                "prompt-execution-ts-end": PROMPT_EXECUTION_END,
+                "prompt-execution-duration": PROMPT_EXECUTION_TIME
+                }
+                ]]>
+                and put RESULT (JSON object) in the result XML fragment:
+
+            <![CDATA[
+                <result>RESULT</result>
+                ]]>
+            </output-format-item>
+        </output-format-list>
+    </output-format>
+
+    <safeguards>
+        <safeguards-list>
+            <safeguards-item>Only use the commands provided to achieve the goal</safeguards-item>
+            <safeguards-item>Only use the variables provided to achieve the goal</safeguards-item>
+            <safeguards-item>Not create any script file</safeguards-item>
+        </safeguards-list>
+    </safeguards>
 
     <acceptance-criteria>
         <acceptance-criteria-list>
@@ -27,6 +107,8 @@
             <acceptance-criteria-item>The solution only prints "Hello World" in the console</acceptance-criteria-item>
             <acceptance-criteria-item>The solution is committed and pushed to the branch to create the PR</acceptance-criteria-item>
             <acceptance-criteria-item>Only commit the file HelloWorld.java only and push the changes to the branch to create the PR</acceptance-criteria-item>
+            <acceptance-criteria-item>The output is in the correct format</acceptance-criteria-item>
+            <acceptance-criteria-item>Print the XML result fragment with the final result of RESULT</acceptance-criteria-item>
         </acceptance-criteria-list>
     </acceptance-criteria>
 </prompt>

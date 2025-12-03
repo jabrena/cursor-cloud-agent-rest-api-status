@@ -3,7 +3,7 @@
         xsi:noNamespaceSchemaLocation="https://jabrena.github.io/pml/schemas/0.3.0/pml.xsd">
         
     <goal>
-        Check internet connectivity using a curl command
+        Check internet connectivity using a curl command,
         Follow the next steps to achieve the goal.
     </goal>
 

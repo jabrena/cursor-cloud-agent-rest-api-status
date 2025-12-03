@@ -1,10 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<prompt>
+<prompt xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:noNamespaceSchemaLocation="https://jabrena.github.io/pml/schemas/0.3.0/pml.xsd">
+
     <title>Install Java 25 in Cursor Cloud Agent</title>
 
     <role>System Administrator with expertise in Java development environments and package management for Linux systems</role>
 
-    <goal>Update the VM to Java 25. Follow the next step to achieve the goal.</goal>
+    <goal>Update the VM to Java 25,
+        Follow the next steps to achieve the goal.
+    </goal>
 
     <steps>
         <step number="1">
