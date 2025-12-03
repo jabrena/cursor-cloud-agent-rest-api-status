@@ -703,7 +703,7 @@ function createLatencyChart(latencyData) {
                     beginAtZero: true,
                     title: {
                         display: true,
-                        text: 'Latency (sec)'
+                        text: 'Pipeline Latency (sec)'
                     },
                     ticks: {
                         callback: function(value) {
