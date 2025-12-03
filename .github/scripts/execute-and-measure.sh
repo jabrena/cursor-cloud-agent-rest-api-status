@@ -66,31 +66,73 @@ LOCAL_DATETIME=$(date +"%Y%m%d %H:%M")
 # Extract cursor-latency from churrera output
 CURSOR_LATENCY=""
 if [ -f "$OUTPUT_FILE" ]; then
+    echo "=== Starting JSON extraction process ==="
     # Get the script directory to ensure we can find extract-result-json.sh
     SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
     EXTRACT_SCRIPT="$SCRIPT_DIR/extract-result-json.sh"
     
-    # Try to extract JSON from result tags
-    set +e  # Temporarily disable exit on error for extraction
-    # Capture stdout and stderr separately - we only want stdout for JSON
-    EXTRACTED_JSON=$(cat "$OUTPUT_FILE" | "$EXTRACT_SCRIPT" 2>/dev/null)
-    EXTRACT_EXIT_CODE=$?
-    set -e
-    
-    if [ $EXTRACT_EXIT_CODE -eq 0 ] && [ -n "$EXTRACTED_JSON" ]; then
-        # Validate that we got JSON (should start with { and be valid JSON)
-        if echo "$EXTRACTED_JSON" | grep -q '^{' && echo "$EXTRACTED_JSON" | jq empty 2>/dev/null; then
-            # Extract prompt-execution-duration value and parse the numeric part
-            # Format is typically: "22 seconds" or just a number
-            set +e  # Temporarily disable exit on error for jq parsing
-            PROMPT_DURATION=$(echo "$EXTRACTED_JSON" | jq -r '.prompt-execution-duration // empty' 2>/dev/null || echo "")
-            set -e
-            if [ -n "$PROMPT_DURATION" ] && [ "$PROMPT_DURATION" != "null" ] && [ "$PROMPT_DURATION" != "empty" ]; then
-                # Extract numeric value (e.g., "22 seconds" -> 22, "2096 seconds" -> 2096)
-                CURSOR_LATENCY=$(echo "$PROMPT_DURATION" | grep -oE '[0-9]+' | head -1 || echo "")
+    if [ ! -f "$EXTRACT_SCRIPT" ]; then
+        echo "Error: Extract script not found at $EXTRACT_SCRIPT" >&2
+    else
+        echo "Using extract script: $EXTRACT_SCRIPT"
+        
+        # Try to extract JSON from result tags
+        set +e  # Temporarily disable exit on error for extraction
+        # Capture stdout and stderr separately - capture stderr to see errors
+        EXTRACT_ERROR_FILE=$(mktemp)
+        EXTRACTED_JSON=$(cat "$OUTPUT_FILE" | "$EXTRACT_SCRIPT" 2>"$EXTRACT_ERROR_FILE")
+        EXTRACT_EXIT_CODE=$?
+        EXTRACT_ERROR=$(cat "$EXTRACT_ERROR_FILE" 2>/dev/null || echo "")
+        rm -f "$EXTRACT_ERROR_FILE"
+        set -e
+        
+        echo "Extraction exit code: $EXTRACT_EXIT_CODE"
+        
+        if [ -n "$EXTRACT_ERROR" ]; then
+            echo "Extraction errors/warnings: $EXTRACT_ERROR" >&2
+        fi
+        
+        if [ $EXTRACT_EXIT_CODE -eq 0 ] && [ -n "$EXTRACTED_JSON" ]; then
+            echo "Extracted JSON (first 200 chars): ${EXTRACTED_JSON:0:200}..."
+            
+            # Validate that we got JSON (should start with { and be valid JSON)
+            if echo "$EXTRACTED_JSON" | grep -q '^{'; then
+                echo "JSON starts with '{', validating..."
+                set +e  # Temporarily disable exit on error for jq validation
+                if echo "$EXTRACTED_JSON" | jq empty 2>/dev/null; then
+                    echo "JSON is valid"
+                    # Extract prompt-execution-duration value and parse the numeric part
+                    # Format is typically: "22 seconds" or just a number
+                    PROMPT_DURATION=$(echo "$EXTRACTED_JSON" | jq -r '.prompt-execution-duration // empty' 2>/dev/null || echo "")
+                    set -e
+                    echo "prompt-execution-duration value: '$PROMPT_DURATION'"
+                    
+                    if [ -n "$PROMPT_DURATION" ] && [ "$PROMPT_DURATION" != "null" ] && [ "$PROMPT_DURATION" != "empty" ]; then
+                        # Extract numeric value (e.g., "22 seconds" -> 22, "2096 seconds" -> 2096)
+                        CURSOR_LATENCY=$(echo "$PROMPT_DURATION" | grep -oE '[0-9]+' | head -1 || echo "")
+                        echo "Extracted cursor-latency: '$CURSOR_LATENCY'"
+                    else
+                        echo "Warning: prompt-execution-duration is empty, null, or not found in JSON"
+                    fi
+                else
+                    set -e
+                    echo "Warning: Extracted text is not valid JSON"
+                    echo "Extracted text: $EXTRACTED_JSON"
+                fi
+            else
+                echo "Warning: Extracted text does not start with '{'"
+                echo "Extracted text (first 500 chars): ${EXTRACTED_JSON:0:500}"
+            fi
+        else
+            if [ $EXTRACT_EXIT_CODE -ne 0 ]; then
+                echo "Warning: JSON extraction failed with exit code $EXTRACT_EXIT_CODE"
+            fi
+            if [ -z "$EXTRACTED_JSON" ]; then
+                echo "Warning: No JSON extracted (empty result)"
             fi
         fi
     fi
+    echo "=== JSON extraction process completed ==="
 fi
 
 # Fetch and pull latest changes before reading measures.json to avoid conflicts
