@@ -14,6 +14,7 @@
                 format YYYYMMDDHHMMSS Execute the following command to create the variable
                 PROMPT_EXECUTION_START: <![CDATA[
                 ```bash
+                rm -f /tmp/prompt_execution_start.txt
                 export PROMPT_EXECUTION_START=$(date +%Y%m%d%H%M%S)
                 echo "$PROMPT_EXECUTION_START" > /tmp/prompt_execution_start.txt
                 ```
