@@ -56,7 +56,7 @@
                 END_FORMATTED="${PROMPT_EXECUTION_END:0:4}-${PROMPT_EXECUTION_END:4:2}-${PROMPT_EXECUTION_END:6:2} ${PROMPT_EXECUTION_END:8:2}:${PROMPT_EXECUTION_END:10:2}:${PROMPT_EXECUTION_END:12:2}"
                 START_EPOCH=$(date -d "$START_FORMATTED" +%s)
                 END_EPOCH=$(date -d "$END_FORMATTED" +%s)
-                PROMPT_EXECUTION_TIME=$((END_EPOCH - START_EPOCH))" seconds"
+                PROMPT_EXECUTION_TIME="$((END_EPOCH - START_EPOCH)) seconds"
                 ```
                 ]]>
             </step-content>
