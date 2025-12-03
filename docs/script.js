@@ -539,14 +539,14 @@ function createLatencyChart(latencyData) {
         return jstHour >= 9 && jstHour <= 17;
     });
     
-    // Define colors for each test-type
+    // Define colors for each test-type - using distinct colors for maximum contrast
     const colors = {
-        'bash': '#47b881',
-        'curl io': '#3498db',
-        'curl io v2': '#9b59b6',
-        'debian package': '#e74c3c',
-        'java hello world': '#f39c12',
-        'sdkman package': '#1abc9c',
+        'bash': '#2ecc71',           // Green
+        'curl io': '#3498db',         // Blue
+        'curl io v2': '#9b59b6',      // Purple
+        'debian package': '#e74c3c',   // Red
+        'java hello world': '#f39c12', // Orange
+        'sdkman package': '#16a085',  // Teal (distinct from green and red)
         // Fallback for any unknown test-types
         'default': '#95a5a6'
     };
@@ -741,6 +741,138 @@ function createLatencyChart(latencyData) {
     return chart;
 }
 
+// Get last measure for each test-type from the last 24 hours
+function getLastMeasuresByTestType(measures) {
+    const now = new Date();
+    const last24Hours = new Date(now.getTime() - 24 * 60 * 60 * 1000);
+    
+    // Filter measures from last 24 hours
+    const recentMeasures = measures.filter(m => {
+        const date = parseDateTime(m.localdatetime);
+        return date >= last24Hours;
+    });
+    
+    // Get all unique test-types
+    const testTypes = new Set();
+    recentMeasures.forEach(measure => {
+        if (measure['test-type']) {
+            testTypes.add(measure['test-type']);
+        }
+    });
+    
+    // Get last measure for each test-type
+    const lastMeasures = {};
+    Array.from(testTypes).forEach(testType => {
+        const typeMeasures = recentMeasures.filter(m => m['test-type'] === testType);
+        if (typeMeasures.length > 0) {
+            // Sort by datetime (ascending) and take the last one (most recent)
+            typeMeasures.sort((a, b) => {
+                const dateA = parseDateTime(a.localdatetime);
+                const dateB = parseDateTime(b.localdatetime);
+                return dateA - dateB;
+            });
+            lastMeasures[testType] = typeMeasures[typeMeasures.length - 1];
+        }
+    });
+    
+    return lastMeasures;
+}
+
+// Create stacked bar chart for latency by experiment
+function createStackedLatencyChart(measures) {
+    const ctx = document.getElementById('stackedLatencyChart').getContext('2d');
+    const lastMeasures = getLastMeasuresByTestType(measures);
+    
+    // Define the specific order for test types
+    const testTypeOrder = ['bash', 'curl io', 'curl io v2', 'debian package', 'sdkman package', 'java hello world'];
+    
+    // Get test types in the specified order, only including those that have data
+    const testTypes = testTypeOrder.filter(testType => lastMeasures.hasOwnProperty(testType));
+    
+    // Prepare data for stacked bar chart
+    const latencyData = [];
+    const cursorLatencyData = [];
+    
+    testTypes.forEach(testType => {
+        const measure = lastMeasures[testType];
+        const latency = measure.latency || 0;
+        const cursorLatency = measure['cursor-latency'] && measure['cursor-latency'] !== '' 
+            ? parseFloat(measure['cursor-latency']) || 0 
+            : 0;
+        
+        latencyData.push(latency - cursorLatency); // Pipeline latency (total - cursor)
+        cursorLatencyData.push(cursorLatency); // Cursor latency
+    });
+    
+    const chart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: testTypes,
+            datasets: [
+                {
+                    label: 'Pipeline Latency',
+                    data: latencyData,
+                    backgroundColor: '#3498db',
+                    borderColor: '#2980b9',
+                    borderWidth: 1
+                },
+                {
+                    label: 'Cursor Latency',
+                    data: cursorLatencyData,
+                    backgroundColor: '#e74c3c',
+                    borderColor: '#c0392b',
+                    borderWidth: 1
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                x: {
+                    stacked: true,
+                    title: {
+                        display: true,
+                        text: 'Experiment (Test Type)'
+                    }
+                },
+                y: {
+                    stacked: true,
+                    beginAtZero: true,
+                    title: {
+                        display: true,
+                        text: 'Latency (seconds)'
+                    },
+                    ticks: {
+                        callback: function(value) {
+                            return value + ' sec';
+                        }
+                    }
+                }
+            },
+            plugins: {
+                legend: {
+                    display: true,
+                    position: 'top'
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            const value = context.parsed.y;
+                            const total = context.datasetIndex === 0 
+                                ? value + cursorLatencyData[context.dataIndex]
+                                : latencyData[context.dataIndex] + value;
+                            return context.dataset.label + ': ' + value.toFixed(2) + ' sec (Total: ' + total.toFixed(2) + ' sec)';
+                        }
+                    }
+                }
+            }
+        }
+    });
+    
+    return chart;
+}
+
 // Load and display hardware details
 async function loadHardwareDetails() {
     try {
@@ -823,6 +955,7 @@ async function loadData() {
         // createHistoryChart(dailyData); // Temporarily disabled - chart removed
         createDailyChart(hourlyData);
         createLatencyChart(latencyData);
+        createStackedLatencyChart(measures);
     } catch (error) {
         console.error('Error loading data:', error);
         document.getElementById('status-text').textContent = 'Error loading data';
