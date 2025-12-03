@@ -83,6 +83,7 @@
                 <result>RESULT</result>
                 ]]>
             </output-format-item>
+            <output-format-item>Print the output of the command execution for all commands</output-format-item>
         </output-format-list>
     </output-format>
 
