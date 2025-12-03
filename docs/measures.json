@@ -13502,5 +13502,12 @@
     "latency": 81,
     "cursor-latency": "53",
     "test-type": "debian package"
+  },
+  {
+    "localdatetime": "20251203 15:11",
+    "status": "UP",
+    "latency": 125,
+    "cursor-latency": "94",
+    "test-type": "sdkman package"
   }
 ]
