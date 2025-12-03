@@ -20,14 +20,18 @@ else
     CONTENT=$(cat)
 fi
 
-# Find the last [conversation] section
-# Collect all sections and keep the last one
-LAST_CONVERSATION=$(echo "$CONTENT" | awk '
+# Find all [conversation] sections, extract the last 3, and search for <result> in them
+# Search from the last section backwards through the last 3 sections
+RESULT=$(echo "$CONTENT" | awk '
     BEGIN { 
-        sections[0]=""
         section_count=0
         current_section=""
         in_section=0
+        all_lines_count=0
+    }
+    {
+        # Store all lines for fallback case
+        all_lines[all_lines_count++] = $0
     }
     /\[conversation\]/ {
         # Save previous section if exists
@@ -50,50 +54,88 @@ LAST_CONVERSATION=$(echo "$CONTENT" | awk '
         if (in_section && current_section != "") {
             sections[section_count++] = current_section
         }
-        # Print the last section
-        if (section_count > 0) {
-            print sections[section_count-1]
-        }
-    }
-')
-
-# If no [conversation] marker found, use the entire content
-if [ -z "$LAST_CONVERSATION" ]; then
-    LAST_CONVERSATION="$CONTENT"
-fi
-
-# Extract content between <result> and </result> tags
-# Use awk to handle multi-line content properly
-RESULT=$(echo "$LAST_CONVERSATION" | awk '
-    BEGIN { in_result=0; result="" }
-    /<result>/ { 
-        in_result=1
-        # Remove everything before <result>
-        sub(/.*<result>/, "")
-        # If </result> is on the same line, extract and stop
-        if (/<\/result>/) {
-            sub(/<\/result>.*/, "")
-            result = result $0
+        
+        # If no sections found, search in entire content
+        if (section_count == 0) {
             in_result=0
-        } else {
-            result = result $0
+            result=""
+            for (k = 0; k < all_lines_count; k++) {
+                line = all_lines[k]
+                if (match(line, /<result>/)) {
+                    in_result=1
+                    # Remove everything before <result>
+                    sub(/.*<result>/, "", line)
+                    # If </result> is on the same line
+                    if (match(line, /<\/result>/)) {
+                        sub(/<\/result>.*/, "", line)
+                        result = result line
+                        in_result=0
+                        break
+                    } else {
+                        result = result line
+                    }
+                } else if (in_result) {
+                    if (match(line, /<\/result>/)) {
+                        sub(/<\/result>.*/, "", line)
+                        result = result line
+                        in_result=0
+                        break
+                    } else {
+                        result = result line "\n"
+                    }
+                }
+            }
+            gsub(/^[ \t\n\r]+|[ \t\n\r]+$/, "", result)
+            print result
+            exit
         }
-        next
-    }
-    in_result {
-        if (/<\/result>/) {
-            # Remove everything after </result>
-            sub(/<\/result>.*/, "")
-            result = result $0
+        
+        # Search in last 3 sections (from last to first)
+        start = (section_count > 3) ? section_count - 3 : 0
+        found = 0
+        
+        for (i = section_count - 1; i >= start && !found; i--) {
+            section = sections[i]
             in_result=0
-        } else {
-            result = result $0 "\n"
+            result=""
+            
+            # Process section line by line
+            n = split(section, lines, "\n")
+            for (j = 1; j <= n; j++) {
+                line = lines[j]
+                if (match(line, /<result>/)) {
+                    in_result=1
+                    # Remove everything before <result>
+                    sub(/.*<result>/, "", line)
+                    # If </result> is on the same line
+                    if (match(line, /<\/result>/)) {
+                        sub(/<\/result>.*/, "", line)
+                        result = result line
+                        in_result=0
+                        found = 1
+                        break
+                    } else {
+                        result = result line
+                    }
+                } else if (in_result) {
+                    if (match(line, /<\/result>/)) {
+                        sub(/<\/result>.*/, "", line)
+                        result = result line
+                        in_result=0
+                        found = 1
+                        break
+                    } else {
+                        result = result line "\n"
+                    }
+                }
+            }
+            
+            if (found) {
+                gsub(/^[ \t\n\r]+|[ \t\n\r]+$/, "", result)
+                print result
+                exit
+            }
         }
-    }
-    END { 
-        # Remove leading/trailing whitespace and newlines
-        gsub(/^[ \t\n\r]+|[ \t\n\r]+$/, "", result)
-        print result
     }
 ')
 
@@ -101,7 +143,7 @@ RESULT=$(echo "$LAST_CONVERSATION" | awk '
 if [ -n "$RESULT" ]; then
     echo "$RESULT"
 else
-    echo "Error: No <result> tag found in the last [conversation] section" >&2
+    echo "Error: No <result> tag found in the last 3 [conversation] sections" >&2
     exit 1
 fi
 

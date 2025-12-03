@@ -46,5 +46,5 @@ jobs:
           CURSOR_API_KEY: ${{ secrets.CURSOR_API_KEY }}
           GITHUB_ACTIONS: true
         run: |
-          chmod +x .github/scripts/execute-and-measure.sh
-          ./.github/scripts/execute-and-measure.sh churrera-recipes/1-hello-world-bash/workflow.xml "bash"
+          chmod +x .github/scripts/execute-hardware-details.sh
+          ./.github/scripts/execute-hardware-details.sh churrera-recipes/7-save-cloud-agent-details/workflow.xml
