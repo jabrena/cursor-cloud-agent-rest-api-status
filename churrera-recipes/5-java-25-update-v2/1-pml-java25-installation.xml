@@ -34,8 +34,8 @@
                 cat /etc/resolv.conf
 
                 # Update Curl
-                sudo apt update
-                sudo apt install -y curl libcurl4
+                sudo apt update -qq
+                sudo apt install -qq -y curl libcurl4
 
                 # Install SDKMAN
                 curl -s "https://get.sdkman.io" | bash

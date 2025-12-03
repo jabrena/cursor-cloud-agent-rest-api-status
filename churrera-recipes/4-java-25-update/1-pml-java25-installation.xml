@@ -34,8 +34,8 @@
                 cat /etc/resolv.conf
 
                 # Install Java 25
-                sudo apt update
-                sudo apt install -y openjdk-25-jdk
+                sudo apt update -qq
+                sudo apt install -qq -y openjdk-25-jdk
                 java -version
                 ```
                 ]]>
