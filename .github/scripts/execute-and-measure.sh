@@ -65,6 +65,7 @@ LOCAL_DATETIME=$(date +"%Y%m%d %H:%M")
 
 # Extract cursor-latency from churrera output
 CURSOR_LATENCY=""
+CURSOR_LATENCY_IS_INT=false
 if [ -f "$OUTPUT_FILE" ]; then
     echo "=== Starting JSON extraction process ==="
     # Get the script directory to ensure we can find extract-result-json.sh
@@ -152,6 +153,16 @@ if [ -f "$OUTPUT_FILE" ]; then
                         ALT_DURATION=$(echo "$EXTRACTED_JSON" | jq -r '.["prompt-execution-duration"]' 2>/dev/null || echo "")
                         echo "Alternative extraction result: '$ALT_DURATION'"
                     fi
+                    
+                    # Validate if CURSOR_LATENCY is a valid integer
+                    if [ -n "$CURSOR_LATENCY" ] && [ "$CURSOR_LATENCY" -eq "$CURSOR_LATENCY" ] 2>/dev/null; then
+                        CURSOR_LATENCY_IS_INT=true
+                        echo "cursor-latency is a valid integer: $CURSOR_LATENCY"
+                    else
+                        CURSOR_LATENCY_IS_INT=false
+                        CURSOR_LATENCY=""
+                        echo "cursor-latency is not a valid integer, will store as empty string"
+                    fi
                 else
                     set -e
                     echo "Warning: Extracted text is not valid JSON"
@@ -188,34 +199,69 @@ MEASURES_FILE="docs/measures.json"
 # Check if file exists and has content
 if [ -f "$MEASURES_FILE" ] && [ -s "$MEASURES_FILE" ]; then
     # Use jq to add new entry to the array
-    # Always include cursor-latency (empty string if not extracted)
+    # cursor-latency: integer if valid, empty string otherwise
     if [ -n "$TEST_TYPE" ]; then
         # Include test-type if provided
-        jq --arg datetime "$LOCAL_DATETIME" \
-           --arg status "$STATUS" \
-           --argjson latency $DURATION \
-           --arg cursorlatency "${CURSOR_LATENCY:-}" \
-           --arg testtype "$TEST_TYPE" \
-           '. += [{"localdatetime": $datetime, "status": $status, "latency": $latency, "cursor-latency": $cursorlatency, "test-type": $testtype}]' \
-           "$MEASURES_FILE" > "$MEASURES_FILE.tmp" && mv "$MEASURES_FILE.tmp" "$MEASURES_FILE"
+        if [ "$CURSOR_LATENCY_IS_INT" = true ]; then
+            # cursor-latency is a valid integer, use --argjson
+            jq --arg datetime "$LOCAL_DATETIME" \
+               --arg status "$STATUS" \
+               --argjson latency $DURATION \
+               --argjson cursorlatency $CURSOR_LATENCY \
+               --arg testtype "$TEST_TYPE" \
+               '. += [{"localdatetime": $datetime, "status": $status, "latency": $latency, "cursor-latency": $cursorlatency, "test-type": $testtype}]' \
+               "$MEASURES_FILE" > "$MEASURES_FILE.tmp" && mv "$MEASURES_FILE.tmp" "$MEASURES_FILE"
+        else
+            # cursor-latency is empty or invalid, use --arg with empty string
+            jq --arg datetime "$LOCAL_DATETIME" \
+               --arg status "$STATUS" \
+               --argjson latency $DURATION \
+               --arg cursorlatency "" \
+               --arg testtype "$TEST_TYPE" \
+               '. += [{"localdatetime": $datetime, "status": $status, "latency": $latency, "cursor-latency": $cursorlatency, "test-type": $testtype}]' \
+               "$MEASURES_FILE" > "$MEASURES_FILE.tmp" && mv "$MEASURES_FILE.tmp" "$MEASURES_FILE"
+        fi
     else
         # No test-type provided
-        jq --arg datetime "$LOCAL_DATETIME" \
-           --arg status "$STATUS" \
-           --argjson latency $DURATION \
-           --arg cursorlatency "${CURSOR_LATENCY:-}" \
-           '. += [{"localdatetime": $datetime, "status": $status, "latency": $latency, "cursor-latency": $cursorlatency}]' \
-           "$MEASURES_FILE" > "$MEASURES_FILE.tmp" && mv "$MEASURES_FILE.tmp" "$MEASURES_FILE"
+        if [ "$CURSOR_LATENCY_IS_INT" = true ]; then
+            # cursor-latency is a valid integer, use --argjson
+            jq --arg datetime "$LOCAL_DATETIME" \
+               --arg status "$STATUS" \
+               --argjson latency $DURATION \
+               --argjson cursorlatency $CURSOR_LATENCY \
+               '. += [{"localdatetime": $datetime, "status": $status, "latency": $latency, "cursor-latency": $cursorlatency}]' \
+               "$MEASURES_FILE" > "$MEASURES_FILE.tmp" && mv "$MEASURES_FILE.tmp" "$MEASURES_FILE"
+        else
+            # cursor-latency is empty or invalid, use --arg with empty string
+            jq --arg datetime "$LOCAL_DATETIME" \
+               --arg status "$STATUS" \
+               --argjson latency $DURATION \
+               --arg cursorlatency "" \
+               '. += [{"localdatetime": $datetime, "status": $status, "latency": $latency, "cursor-latency": $cursorlatency}]' \
+               "$MEASURES_FILE" > "$MEASURES_FILE.tmp" && mv "$MEASURES_FILE.tmp" "$MEASURES_FILE"
+        fi
     fi
 else
     # Create new file with single entry
-    # Always include cursor-latency (empty string if not extracted)
+    # cursor-latency: integer if valid, empty string otherwise
     if [ -n "$TEST_TYPE" ]; then
         # Include test-type if provided
-        echo "[{\"localdatetime\": \"$LOCAL_DATETIME\", \"status\": \"$STATUS\", \"latency\": $DURATION, \"cursor-latency\": \"${CURSOR_LATENCY:-}\", \"test-type\": \"$TEST_TYPE\"}]" > "$MEASURES_FILE"
+        if [ "$CURSOR_LATENCY_IS_INT" = true ]; then
+            # cursor-latency is a valid integer, output without quotes
+            echo "[{\"localdatetime\": \"$LOCAL_DATETIME\", \"status\": \"$STATUS\", \"latency\": $DURATION, \"cursor-latency\": $CURSOR_LATENCY, \"test-type\": \"$TEST_TYPE\"}]" > "$MEASURES_FILE"
+        else
+            # cursor-latency is empty or invalid, output as empty string
+            echo "[{\"localdatetime\": \"$LOCAL_DATETIME\", \"status\": \"$STATUS\", \"latency\": $DURATION, \"cursor-latency\": \"\", \"test-type\": \"$TEST_TYPE\"}]" > "$MEASURES_FILE"
+        fi
     else
         # No test-type provided
-        echo "[{\"localdatetime\": \"$LOCAL_DATETIME\", \"status\": \"$STATUS\", \"latency\": $DURATION, \"cursor-latency\": \"${CURSOR_LATENCY:-}\"}]" > "$MEASURES_FILE"
+        if [ "$CURSOR_LATENCY_IS_INT" = true ]; then
+            # cursor-latency is a valid integer, output without quotes
+            echo "[{\"localdatetime\": \"$LOCAL_DATETIME\", \"status\": \"$STATUS\", \"latency\": $DURATION, \"cursor-latency\": $CURSOR_LATENCY}]" > "$MEASURES_FILE"
+        else
+            # cursor-latency is empty or invalid, output as empty string
+            echo "[{\"localdatetime\": \"$LOCAL_DATETIME\", \"status\": \"$STATUS\", \"latency\": $DURATION, \"cursor-latency\": \"\"}]" > "$MEASURES_FILE"
+        fi
     fi
 fi
 
