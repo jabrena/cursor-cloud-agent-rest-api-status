@@ -22,11 +22,19 @@ START_TIME=$(date +%s)
 
 # Execute the churrera workflow with 5 minute timeout
 jbang trust add https://github.com/jabrena/
+# Ensure extract script is executable
+chmod +x .github/scripts/extract-result-json.sh
+
+# Capture output to a temporary file for JSON extraction
+OUTPUT_FILE=$(mktemp)
 # Temporarily disable exit on error to handle timeout gracefully
 set +e
-timeout 300 jbang churrera@jabrena run --workflow "$WORKFLOW_FILE" --show-logs --delete-on-success-completion
+timeout 300 jbang churrera@jabrena run --workflow "$WORKFLOW_FILE" --show-logs --delete-on-success-completion > "$OUTPUT_FILE" 2>&1
 EXIT_CODE=$?
 set -e
+
+# Display the output (logs will appear in GitHub Actions)
+cat "$OUTPUT_FILE"
 
 # Capture end time
 END_TIME=$(date +%s)
@@ -55,6 +63,26 @@ fi
 # Get current date and time in format YYYYMMDD HH:MM
 LOCAL_DATETIME=$(date +"%Y%m%d %H:%M")
 
+# Extract cursor-latency from churrera output
+CURSOR_LATENCY=""
+if [ -f "$OUTPUT_FILE" ]; then
+    # Try to extract JSON from result tags
+    set +e  # Temporarily disable exit on error for extraction
+    EXTRACTED_JSON=$(cat "$OUTPUT_FILE" | ./.github/scripts/extract-result-json.sh 2>/dev/null || echo "")
+    set -e
+    if [ -n "$EXTRACTED_JSON" ]; then
+        # Extract prompt-execution-duration value and parse the numeric part
+        # Format is typically: "22 seconds" or just a number
+        set +e  # Temporarily disable exit on error for jq parsing
+        PROMPT_DURATION=$(echo "$EXTRACTED_JSON" | jq -r '.prompt-execution-duration // empty' 2>/dev/null || echo "")
+        set -e
+        if [ -n "$PROMPT_DURATION" ]; then
+            # Extract numeric value (e.g., "22 seconds" -> 22)
+            CURSOR_LATENCY=$(echo "$PROMPT_DURATION" | grep -oE '[0-9]+' | head -1 || echo "")
+        fi
+    fi
+fi
+
 # Fetch and pull latest changes before reading measures.json to avoid conflicts
 # when running multiple times in sequence
 if [ -n "$GITHUB_ACTIONS" ]; then
@@ -70,34 +98,41 @@ MEASURES_FILE="docs/measures.json"
 # Check if file exists and has content
 if [ -f "$MEASURES_FILE" ] && [ -s "$MEASURES_FILE" ]; then
     # Use jq to add new entry to the array
+    # Always include cursor-latency (empty string if not extracted)
     if [ -n "$TEST_TYPE" ]; then
         # Include test-type if provided
         jq --arg datetime "$LOCAL_DATETIME" \
            --arg status "$STATUS" \
            --argjson latency $DURATION \
+           --arg cursorlatency "${CURSOR_LATENCY:-}" \
            --arg testtype "$TEST_TYPE" \
-           '. += [{"localdatetime": $datetime, "status": $status, "latency": $latency, "test-type": $testtype}]' \
+           '. += [{"localdatetime": $datetime, "status": $status, "latency": $latency, "cursor-latency": $cursorlatency, "test-type": $testtype}]' \
            "$MEASURES_FILE" > "$MEASURES_FILE.tmp" && mv "$MEASURES_FILE.tmp" "$MEASURES_FILE"
     else
         # No test-type provided
         jq --arg datetime "$LOCAL_DATETIME" \
            --arg status "$STATUS" \
            --argjson latency $DURATION \
-           '. += [{"localdatetime": $datetime, "status": $status, "latency": $latency}]' \
+           --arg cursorlatency "${CURSOR_LATENCY:-}" \
+           '. += [{"localdatetime": $datetime, "status": $status, "latency": $latency, "cursor-latency": $cursorlatency}]' \
            "$MEASURES_FILE" > "$MEASURES_FILE.tmp" && mv "$MEASURES_FILE.tmp" "$MEASURES_FILE"
     fi
 else
     # Create new file with single entry
+    # Always include cursor-latency (empty string if not extracted)
     if [ -n "$TEST_TYPE" ]; then
         # Include test-type if provided
-        echo "[{\"localdatetime\": \"$LOCAL_DATETIME\", \"status\": \"$STATUS\", \"latency\": $DURATION, \"test-type\": \"$TEST_TYPE\"}]" > "$MEASURES_FILE"
+        echo "[{\"localdatetime\": \"$LOCAL_DATETIME\", \"status\": \"$STATUS\", \"latency\": $DURATION, \"cursor-latency\": \"${CURSOR_LATENCY:-}\", \"test-type\": \"$TEST_TYPE\"}]" > "$MEASURES_FILE"
     else
         # No test-type provided
-        echo "[{\"localdatetime\": \"$LOCAL_DATETIME\", \"status\": \"$STATUS\", \"latency\": $DURATION}]" > "$MEASURES_FILE"
+        echo "[{\"localdatetime\": \"$LOCAL_DATETIME\", \"status\": \"$STATUS\", \"latency\": $DURATION, \"cursor-latency\": \"${CURSOR_LATENCY:-}\"}]" > "$MEASURES_FILE"
     fi
 fi
 
-echo "Execution completed: Duration=${DURATION}s, Status=${STATUS}"
+echo "Execution completed: Duration=${DURATION}s, Status=${STATUS}, Cursor-Latency=${CURSOR_LATENCY:-""}"
+
+# Cleanup temporary output file
+rm -f "$OUTPUT_FILE"
 
 # Commit and push measures.json if running in CI environment
 if [ -n "$GITHUB_ACTIONS" ]; then
