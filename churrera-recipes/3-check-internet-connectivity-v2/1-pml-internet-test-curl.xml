@@ -4,23 +4,107 @@
         
     <goal>
         Check internet connectivity using a curl command
-
-        <![CDATA[ 
-        ```bash
-        # Update DNS
-        sudo sed 's/nameserver 1.1.1.1/nameserver 8.8.8.8/g' /etc/resolv.conf | sudo tee /etc/resolv.conf > /dev/null
-        grep -q "nameserver 8.8.8.8" /etc/resolv.conf || echo "nameserver 8.8.8.8" | sudo tee -a /etc/resolv.conf
-        cat /etc/resolv.conf
-
-        # Update Curl
-        sudo apt update
-        sudo apt install -y curl libcurl4
-
-        # Test internet connectivity
-        curl -L https://google.com/ | grep "Google" | head -5
-        ```
-        ]]>
+        Follow the next steps to achieve the goal.
     </goal>
 
-    <output-format>Not explain anything only show the output of the curl command</output-format>
+    <steps>
+        <step number="1">
+            <step-title>Measure the execution time</step-title>
+            <step-content> Store in the variable PROMPT_EXECUTION_START the current timestamp in the
+                format YYYYMMDDHHMMSS Execute the following command to create the variable
+                PROMPT_EXECUTION_START: <![CDATA[
+                ```bash
+                export PROMPT_EXECUTION_START=$(date +%Y%m%d%H%M%S)
+                echo "$PROMPT_EXECUTION_START" > /tmp/prompt_execution_start.txt
+                ```
+                ]]>
+            </step-content>
+        </step>
+        <step number="2">
+            <step-title>Update DNS and Curl and execute connectivity test</step-title>
+            <step-content> 
+            Execute the following commands to update the DNS and Curl: <![CDATA[ 
+
+            ```bash
+            # Update DNS
+            sudo sed 's/nameserver 1.1.1.1/nameserver 8.8.8.8/g' /etc/resolv.conf | sudo tee /etc/resolv.conf > /dev/null
+            grep -q "nameserver 8.8.8.8" /etc/resolv.conf || echo "nameserver 8.8.8.8" | sudo tee -a /etc/resolv.conf
+            cat /etc/resolv.conf
+
+            # Update Curl
+            sudo apt update -qq
+            sudo apt install -qq -y curl libcurl4
+
+            # Test internet connectivity
+            curl -L https://google.com | grep "Marca" | head -5
+            ```
+            ]]>
+            </step-content>
+        </step>
+        <step number="3">
+            <step-title>Measure the execution time</step-title>
+            <step-content> Store in the variable PROMPT_EXECUTION_END the current timestamp in the
+                format YYYYMMDDHHMMSS Use the following command to help in the process: <![CDATA[
+                
+                Calculate in seconds the difference between PROMPT_EXECUTION_START and
+                PROMPT_EXECUTION_END
+                and store it in the variable PROMPT_EXECUTION_TIME
+                add a suffix " seconds" to the variable PROMPT_EXECUTION_TIME
+
+                Execute the following commands to create the variable PROMPT_EXECUTION_TIME:
+
+                <![CDATA[
+                ```bash
+                PROMPT_EXECUTION_START=$(cat /tmp/prompt_execution_start.txt)
+                PROMPT_EXECUTION_END=$(date +%Y%m%d%H%M%S)
+                
+                # Convert YYYYMMDDHHMMSS to YYYY-MM-DD HH:MM:SS format, then to Unix timestamp
+                START_FORMATTED="${PROMPT_EXECUTION_START:0:4}-${PROMPT_EXECUTION_START:4:2}-${PROMPT_EXECUTION_START:6:2} ${PROMPT_EXECUTION_START:8:2}:${PROMPT_EXECUTION_START:10:2}:${PROMPT_EXECUTION_START:12:2}"
+                END_FORMATTED="${PROMPT_EXECUTION_END:0:4}-${PROMPT_EXECUTION_END:4:2}-${PROMPT_EXECUTION_END:6:2} ${PROMPT_EXECUTION_END:8:2}:${PROMPT_EXECUTION_END:10:2}:${PROMPT_EXECUTION_END:12:2}"
+                START_EPOCH=$(date -d "$START_FORMATTED" +%s)
+                END_EPOCH=$(date -d "$END_FORMATTED" +%s)
+                PROMPT_EXECUTION_TIME=$((END_EPOCH - START_EPOCH))" seconds"
+                ```
+                ]]>
+            </step-content>
+        </step>
+    </steps>
+
+    <output-format>
+        <output-format-list>
+            <output-format-item>
+                Replace in the following xml fragment the RESULT with
+                a JSON object with the following fields values:
+
+                <![CDATA[
+                {
+                "prompt-execution-ts-start": PROMPT_EXECUTION_START,
+                "prompt-execution-ts-end": PROMPT_EXECUTION_END,
+                "prompt-execution-duration": PROMPT_EXECUTION_TIME
+                }
+                ]]>
+
+                and put RESULT (JSON object) in the result XML fragment:
+                
+                <![CDATA[
+                <result>RESULT</result>
+                ]]>
+            </output-format-item>
+        </output-format-list>
+    </output-format>
+
+    <safeguards>
+        <safeguards-list>
+            <safeguards-item>Only use the commands provided to achieve the goal</safeguards-item>
+            <safeguards-item>Only use the variables provided to achieve the goal</safeguards-item>
+            <safeguards-item>Not create any script file</safeguards-item>
+        </safeguards-list>
+    </safeguards>
+
+    <acceptance-criteria>
+        <acceptance-criteria-list>
+            <acceptance-criteria-item>The output is in the correct format</acceptance-criteria-item>
+            <acceptance-criteria-item>Print the XML result fragment with the final result of RESULT</acceptance-criteria-item>
+        </acceptance-criteria-list>
+    </acceptance-criteria>
 </prompt>
