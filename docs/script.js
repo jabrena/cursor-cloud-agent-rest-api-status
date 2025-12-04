@@ -611,8 +611,26 @@ function createLatencyChart(latencyData, timePeriod = '24h') {
         'debian package': 'java 25'
     };
     
-    // Create datasets for each test-type
-    const datasets = latencyData.testTypes.map(testType => {
+    // Define the desired order for test types
+    const testTypeOrder = ['bash', 'curl io', 'debian package', 'java hello world'];
+    
+    // Sort test types according to the desired order
+    const sortedTestTypes = [...latencyData.testTypes].sort((a, b) => {
+        const indexA = testTypeOrder.indexOf(a);
+        const indexB = testTypeOrder.indexOf(b);
+        // If both are in the order, sort by their position
+        if (indexA !== -1 && indexB !== -1) {
+            return indexA - indexB;
+        }
+        // If only one is in the order, prioritize it
+        if (indexA !== -1) return -1;
+        if (indexB !== -1) return 1;
+        // If neither is in the order, maintain original order
+        return latencyData.testTypes.indexOf(a) - latencyData.testTypes.indexOf(b);
+    });
+    
+    // Create datasets for each test-type in the sorted order
+    const datasets = sortedTestTypes.map(testType => {
         const color = colors[testType] || colors['default'];
         const displayLabel = labelMap[testType] || testType;
         return {
@@ -666,7 +684,7 @@ function createLatencyChart(latencyData, timePeriod = '24h') {
             plugins: {
                 legend: {
                     display: true,
-                    position: 'top'
+                    position: 'bottom'
                 },
                 tooltip: {
                     callbacks: {
@@ -811,7 +829,7 @@ function createStackedLatencyChart(measures) {
             plugins: {
                 legend: {
                     display: true,
-                    position: 'top'
+                    position: 'bottom'
                 },
                 tooltip: {
                     callbacks: {
