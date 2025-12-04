@@ -6,6 +6,5 @@
         "dockerfile": "Dockerfile",
         "context": "."
     },
-    "install": "./mvnw install -f pom.xml -DskipTests",
     "terminals": []
 }
