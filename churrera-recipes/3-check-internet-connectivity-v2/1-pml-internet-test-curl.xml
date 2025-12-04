@@ -32,9 +32,10 @@
             grep -q "nameserver 8.8.8.8" /etc/resolv.conf || echo "nameserver 8.8.8.8" | sudo tee -a /etc/resolv.conf
             cat /etc/resolv.conf
 
-            # Update Curl
-            sudo apt update -qq
-            sudo apt install -qq -y curl libcurl4
+            # Using .cursor/environment.json
+            # the Curl is already installed
+            #sudo apt update -qq
+            #sudo apt install -qq -y curl libcurl4
 
             # Test internet connectivity
             curl -L https://google.com | grep "Marca" | head -5
