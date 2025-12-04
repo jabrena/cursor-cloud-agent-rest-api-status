@@ -16,6 +16,7 @@
                 Execute the following command to store the current timestamp in the variable PROMPT_EXECUTION_START:
 
                 ```bash
+                source .cursor/time-utils.sh
                 set_prompt_execution_start
                 ```
             </step-content>  
@@ -29,9 +30,11 @@
         <step number="3">
             <step-title>Measure the execution time</step-title>
             <step-content>
-                Execute the following command to calculate the execution time and store it in the variable PROMPT_EXECUTION_TIME:
+                Execute the following command to calculate the execution time and store it in the
+                variable PROMPT_EXECUTION_TIME:
 
                 ```bash
+                source .cursor/time-utils.sh
                 calculate_prompt_execution_time
                 ```
             </step-content>

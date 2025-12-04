@@ -71,12 +71,6 @@ ENV PATH="${JAVA_HOME}/bin:${PATH}"
 RUN echo 'export JAVA_HOME="/home/developer/.sdkman/candidates/java/current"' >> /home/developer/.bashrc && \
     echo 'export PATH="${JAVA_HOME}/bin:${PATH}"' >> /home/developer/.bashrc
 
-# Copy time-utils.sh script
-COPY --chown=developer:developer .cursor/time-utils.sh /home/developer/.cursor/time-utils.sh
-
-# Make time-utils.sh available in shell sessions for developer user
-RUN echo '[ -f /home/developer/.cursor/time-utils.sh ] && source /home/developer/.cursor/time-utils.sh' >> /home/developer/.bashrc
-
 # Set working directory
 WORKDIR /workspace
 
