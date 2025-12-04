@@ -35,7 +35,14 @@
         </div>
 
         <div class="section">
-            <h3>Pipeline latency by test type (Last 24h, UTC)</h3>
+            <div class="section-header-with-controls">
+                <h3>Pipeline latency by test type (UTC)</h3>
+                <div class="time-period-selector">
+                    <label><input type="radio" name="timePeriod" value="24h" checked> Last 24h</label>
+                    <label><input type="radio" name="timePeriod" value="1week"> 1 Week</label>
+                    <label><input type="radio" name="timePeriod" value="1month"> 1 Month</label>
+                </div>
+            </div>
             <div class="latency-chart-container">
                 <canvas id="latencyChart"></canvas>
             </div>

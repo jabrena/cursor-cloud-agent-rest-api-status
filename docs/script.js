@@ -85,6 +85,104 @@ function aggregateByDay(measures) {
     return result;
 }
 
+// Helper function to calculate median
+function calculateMedian(values) {
+    if (values.length === 0) return null;
+    const sorted = values.filter(v => v !== null && v !== undefined).sort((a, b) => a - b);
+    if (sorted.length === 0) return null;
+    const mid = Math.floor(sorted.length / 2);
+    return sorted.length % 2 === 0 
+        ? (sorted[mid - 1] + sorted[mid]) / 2 
+        : sorted[mid];
+}
+
+// Aggregate latency data by day (median) for 1 week (7 days)
+function aggregateLatencyByDayAndType(measures, days) {
+    const now = new Date();
+    now.setHours(0, 0, 0, 0);
+    
+    // Create a map to store daily data
+    const dailyData = {};
+    
+    // Initialize days (from N days ago to today)
+    for (let i = 0; i < days; i++) {
+        const daysBack = days - 1 - i; // days-1, days-2, ..., 1, 0
+        const slotDate = new Date(now);
+        slotDate.setDate(now.getDate() - daysBack);
+        slotDate.setHours(0, 0, 0, 0);
+        
+        const dateKey = slotDate.toISOString().split('T')[0]; // YYYY-MM-DD format
+        dailyData[dateKey] = { 
+            measures: [], 
+            date: new Date(slotDate)
+        };
+    }
+
+    // Add measures to their respective days
+    measures.forEach(measure => {
+        const measureDate = parseDateTime(measure.localdatetime);
+        measureDate.setHours(0, 0, 0, 0);
+        const dateKey = measureDate.toISOString().split('T')[0];
+        
+        if (dailyData[dateKey]) {
+            dailyData[dateKey].measures.push(measure);
+        }
+    });
+
+    // Get all unique test-types, excluding curl io v2 and sdkman package
+    const excludedTestTypes = ['curl io v2', 'sdkman package'];
+    const testTypes = new Set();
+    measures.forEach(measure => {
+        if (measure['test-type'] && !excludedTestTypes.includes(measure['test-type'])) {
+            testTypes.add(measure['test-type']);
+        }
+    });
+
+    // Build result structure: for each day, calculate median latency per test-type
+    const result = {
+        days: [],
+        testTypes: Array.from(testTypes),
+        data: {}
+    };
+
+    // Initialize data structure for each test-type
+    result.testTypes.forEach(testType => {
+        result.data[testType] = [];
+    });
+
+    // Process each day
+    for (let i = 0; i < days; i++) {
+        const daysBack = days - 1 - i; // days-1, days-2, ..., 1, 0
+        const slotDate = new Date(now);
+        slotDate.setDate(now.getDate() - daysBack);
+        slotDate.setHours(0, 0, 0, 0);
+        
+        const dateKey = slotDate.toISOString().split('T')[0];
+        const dayData = dailyData[dateKey] || { 
+            measures: [], 
+            date: new Date(slotDate) 
+        };
+        
+        result.days.push({
+            date: dayData.date
+        });
+
+        // Calculate median latency for each test-type in this day
+        result.testTypes.forEach(testType => {
+            const typeMeasures = dayData.measures.filter(m => m['test-type'] === testType && m.status === 'UP');
+            if (typeMeasures.length > 0) {
+                const latencies = typeMeasures.map(m => m.latency).filter(l => l !== null && l !== undefined);
+                const median = calculateMedian(latencies);
+                result.data[testType].push(median);
+            } else {
+                result.data[testType].push(null); // No data for this day/test-type combination
+            }
+        });
+    }
+
+    return result;
+}
+
 // Aggregate latency data by hour and test-type for latency chart
 function aggregateLatencyByHourAndType(measures) {
     const now = new Date();
@@ -459,13 +557,42 @@ function createDailyChart(hourlyData) {
     return chart;
 }
 
+// Global variable to store latency chart instance and measures data
+let latencyChartInstance = null;
+let allMeasures = [];
+
 // Create latency chart by test-type
-function createLatencyChart(latencyData) {
+function createLatencyChart(latencyData, timePeriod = '24h') {
     const ctx = document.getElementById('latencyChart').getContext('2d');
-    const labels = latencyData.hours.map(h => {
-        const hour = h.hour;
-        return hour.toString().padStart(2, '0') + ':00';
-    });
+    
+    // Determine labels and x-axis title based on time period
+    let labels;
+    let xAxisTitle;
+    
+    if (timePeriod === '24h' && latencyData.hours) {
+        // Hourly data for 24h
+        labels = latencyData.hours.map(h => {
+            const hour = h.hour;
+            return hour.toString().padStart(2, '0') + ':00';
+        });
+        xAxisTitle = 'Hour';
+    } else if (latencyData.days) {
+        // Daily data for 1 week or 1 month
+        labels = latencyData.days.map(d => {
+            const date = d.date;
+            const month = date.toLocaleString('default', { month: 'short' });
+            const day = date.getDate();
+            return `${month} ${day}`;
+        });
+        xAxisTitle = 'Day';
+    } else {
+        // Fallback to hours if structure is unexpected
+        labels = latencyData.hours ? latencyData.hours.map(h => {
+            const hour = h.hour;
+            return hour.toString().padStart(2, '0') + ':00';
+        }) : [];
+        xAxisTitle = 'Hour';
+    }
     
     // Define colors for each test-type - using distinct colors for maximum contrast
     const colors = {
@@ -502,7 +629,12 @@ function createLatencyChart(latencyData) {
         };
     });
 
-    const chart = new Chart(ctx, {
+    // Destroy existing chart if it exists
+    if (latencyChartInstance) {
+        latencyChartInstance.destroy();
+    }
+
+    latencyChartInstance = new Chart(ctx, {
         type: 'line',
         data: {
             labels: labels,
@@ -527,7 +659,7 @@ function createLatencyChart(latencyData) {
                 x: {
                     title: {
                         display: true,
-                        text: 'Hour'
+                        text: xAxisTitle
                     }
                 }
             },
@@ -551,7 +683,7 @@ function createLatencyChart(latencyData) {
         }
     });
     
-    return chart;
+    return latencyChartInstance;
 }
 
 // Get last measure for each test-type from the last 24 hours
@@ -742,11 +874,50 @@ async function loadHardwareDetails() {
     }
 }
 
+// Update latency chart based on selected time period
+function updateLatencyChart(timePeriod) {
+    if (allMeasures.length === 0) return;
+    
+    const now = new Date();
+    let latencyData;
+    let headingText;
+    
+    if (timePeriod === '24h') {
+        // Last 24 hours - hourly data
+        const last24Hours = new Date(now.getTime() - 24 * 60 * 60 * 1000);
+        const recentMeasures = allMeasures.filter(m => {
+            const date = parseDateTime(m.localdatetime);
+            return date >= last24Hours;
+        });
+        latencyData = aggregateLatencyByHourAndType(recentMeasures);
+    } else if (timePeriod === '1week') {
+        // 1 Week - median of previous 7 days
+        const last7Days = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+        const recentMeasures = allMeasures.filter(m => {
+            const date = parseDateTime(m.localdatetime);
+            return date >= last7Days;
+        });
+        latencyData = aggregateLatencyByDayAndType(recentMeasures, 7);
+    } else if (timePeriod === '1month') {
+        // 1 Month - median of last 30 days
+        const last30Days = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+        const recentMeasures = allMeasures.filter(m => {
+            const date = parseDateTime(m.localdatetime);
+            return date >= last30Days;
+        });
+        latencyData = aggregateLatencyByDayAndType(recentMeasures, 30);
+    }
+    
+    // Update chart
+    createLatencyChart(latencyData, timePeriod);
+}
+
 // Load and process data
 async function loadData() {
     try {
         const response = await fetch('measures.json');
         const measures = await response.json();
+        allMeasures = measures; // Store globally for time period updates
         
         // Update status banner
         const currentStatus = getCurrentStatus(measures);
@@ -780,8 +951,16 @@ async function loadData() {
         // Create charts
         // createHistoryChart(dailyData); // Temporarily disabled - chart removed
         createDailyChart(hourlyData);
-        createLatencyChart(latencyData);
+        createLatencyChart(latencyData, '24h');
         createStackedLatencyChart(measures);
+        
+        // Add event listeners for radio buttons
+        const radioButtons = document.querySelectorAll('input[name="timePeriod"]');
+        radioButtons.forEach(radio => {
+            radio.addEventListener('change', function() {
+                updateLatencyChart(this.value);
+            });
+        });
     } catch (error) {
         console.error('Error loading data:', error);
         document.getElementById('status-text').textContent = 'Error loading data';

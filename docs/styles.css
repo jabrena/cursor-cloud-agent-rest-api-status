@@ -153,6 +153,40 @@ header {
     color: #333;
 }
 
+.section-header-with-controls {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+    gap: 15px;
+}
+
+.section-header-with-controls h3 {
+    margin-bottom: 0;
+}
+
+.time-period-selector {
+    display: flex;
+    gap: 20px;
+    align-items: center;
+}
+
+.time-period-selector label {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 14px;
+    color: #333;
+    cursor: pointer;
+    user-select: none;
+}
+
+.time-period-selector input[type="radio"] {
+    cursor: pointer;
+    margin: 0;
+}
+
 .chart-container {
     position: relative;
     height: 300px;
@@ -343,6 +377,16 @@ footer a:hover {
 
     .hardware-table td:first-child {
         width: 35%;
+    }
+
+    .section-header-with-controls {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .time-period-selector {
+        width: 100%;
+        justify-content: flex-start;
     }
 }
 
