@@ -4,6 +4,9 @@ FROM ubuntu:24.04
 # Set environment variables
 ENV DEBIAN_FRONTEND=noninteractive
 
+# Set default shell to bash (required for SDKMAN)
+SHELL ["/bin/bash", "-c"]
+
 # Update and install basic dependencies
 RUN apt-get update && apt-get install -y --no-install-recommends \
     curl \
@@ -59,6 +62,14 @@ RUN bash -c "source ${SDKMAN_DIR}/bin/sdkman-init.sh && \
 # Make SDKMAN available in shell sessions for developer user
 RUN echo 'export SDKMAN_DIR="/home/developer/.sdkman"' >> /home/developer/.bashrc && \
     echo '[[ -s "${SDKMAN_DIR}/bin/sdkman-init.sh" ]] && source "${SDKMAN_DIR}/bin/sdkman-init.sh"' >> /home/developer/.bashrc
+
+# Set JAVA_HOME environment variable
+ENV JAVA_HOME="/home/developer/.sdkman/candidates/java/current"
+ENV PATH="${JAVA_HOME}/bin:${PATH}"
+
+# Make JAVA_HOME available in shell sessions for developer user
+RUN echo 'export JAVA_HOME="/home/developer/.sdkman/candidates/java/current"' >> /home/developer/.bashrc && \
+    echo 'export PATH="${JAVA_HOME}/bin:${PATH}"' >> /home/developer/.bashrc
 
 # Set working directory
 WORKDIR /workspace
