@@ -116,10 +116,11 @@ function aggregateLatencyByHourAndType(measures) {
         }
     });
 
-    // Get all unique test-types
+    // Get all unique test-types, excluding curl io v2 and sdkman package
+    const excludedTestTypes = ['curl io v2', 'sdkman package'];
     const testTypes = new Set();
     measures.forEach(measure => {
-        if (measure['test-type']) {
+        if (measure['test-type'] && !excludedTestTypes.includes(measure['test-type'])) {
             testTypes.add(measure['test-type']);
         }
     });
@@ -466,79 +467,6 @@ function createLatencyChart(latencyData) {
         return hour.toString().padStart(2, '0') + ':00';
     });
     
-    // Convert UTC hours to different timezones (using standard time offsets)
-    // ET: UTC-5 (EST), CT: UTC-6 (CST), PT: UTC-8 (PST), CET: UTC+1
-    const getETHour = (utcHour) => {
-        return (utcHour - 5 + 24) % 24; // UTC-5
-    };
-    
-    const getCTHour = (utcHour) => {
-        return (utcHour - 6 + 24) % 24; // UTC-6
-    };
-    
-    const getPTHour = (utcHour) => {
-        return (utcHour - 8 + 24) % 24; // UTC-8
-    };
-    
-    const getCETHour = (utcHour) => {
-        return (utcHour + 1) % 24; // UTC+1
-    };
-    
-    const getISTHour = (utcHour) => {
-        // IST: UTC+5:30, approximate to nearest hour
-        // UTC 3:30 = IST 9:00, UTC 4:30 = IST 10:00, etc.
-        // For hourly approximation: UTC 4-11 maps to IST 9-17
-        return (utcHour + 5) % 24; // Approximate UTC+5:30 as UTC+5
-    };
-    
-    const getCSTHour = (utcHour) => {
-        return (utcHour + 8) % 24; // UTC+8 (China Standard Time)
-    };
-    
-    const getJSTHour = (utcHour) => {
-        return (utcHour + 9) % 24; // UTC+9
-    };
-    
-    // Track which hours should have bars for each timezone (9-17 local time)
-    const etBarHours = latencyData.hours.map(h => {
-        const etHour = getETHour(h.hour);
-        return etHour >= 9 && etHour <= 17;
-    });
-    
-    const ctBarHours = latencyData.hours.map(h => {
-        const ctHour = getCTHour(h.hour);
-        return ctHour >= 9 && ctHour <= 17;
-    });
-    
-    const ptBarHours = latencyData.hours.map(h => {
-        const ptHour = getPTHour(h.hour);
-        return ptHour >= 9 && ptHour <= 17;
-    });
-    
-    const cetBarHours = latencyData.hours.map(h => {
-        const cetHour = getCETHour(h.hour);
-        return cetHour >= 9 && cetHour <= 17;
-    });
-    
-    const istBarHours = latencyData.hours.map(h => {
-        // IST: UTC+5:30
-        // UTC 3:30 = IST 9:00, UTC 11:30 = IST 17:00
-        // For hourly approximation: UTC 3-11 maps to IST 9-17
-        // More precisely: UTC hour 3 (3:00-3:59) ≈ IST 8:30-9:29 (rounds to 9)
-        //                 UTC hour 11 (11:00-11:59) ≈ IST 16:30-17:29 (rounds to 17)
-        return h.hour >= 3 && h.hour <= 11;
-    });
-    
-    const cstBarHours = latencyData.hours.map(h => {
-        const cstHour = getCSTHour(h.hour);
-        return cstHour >= 9 && cstHour <= 17;
-    });
-    
-    const jstBarHours = latencyData.hours.map(h => {
-        const jstHour = getJSTHour(h.hour);
-        return jstHour >= 9 && jstHour <= 17;
-    });
-    
     // Define colors for each test-type - using distinct colors for maximum contrast
     const colors = {
         'bash': '#2ecc71',           // Green
@@ -551,11 +479,17 @@ function createLatencyChart(latencyData) {
         'default': '#95a5a6'
     };
     
+    // Map test-type names to display labels
+    const labelMap = {
+        'debian package': 'java 25'
+    };
+    
     // Create datasets for each test-type
     const datasets = latencyData.testTypes.map(testType => {
         const color = colors[testType] || colors['default'];
+        const displayLabel = labelMap[testType] || testType;
         return {
-            label: testType,
+            label: displayLabel,
             data: latencyData.data[testType],
             borderColor: color,
             backgroundColor: color + '20', // Add transparency
@@ -568,136 +502,15 @@ function createLatencyChart(latencyData) {
         };
     });
 
-    // Plugin to draw timezone rows and legend
-    const timezonePlugin = {
-        id: 'timezonePlugin',
-        afterDraw: (chart) => {
-            const ctx = chart.ctx;
-            const chartArea = chart.chartArea;
-            const xScale = chart.scales.x;
-            const xAxisBottom = xScale.bottom;
-            const rowHeight = 6.25; // Quarter of original height (25/4)
-            const rowSpacing = 3; // Space between timezone rows
-            const spacing = 5; // Space between x-axis labels and first timezone row
-            const legendSpacing = 8; // Space between timezone rows and legend
-            
-            // Timezone colors
-            const timezoneColors = {
-                et: '#2E86AB',  // Blue for Eastern Time
-                ct: '#F18F01',  // Orange for Central Time
-                pt: '#C77DFF',  // Purple for Pacific Time
-                cet: '#006994',  // Marine blue for CET
-                ist: '#FF6B6B',  // Red for India Standard Time
-                cst: '#4ECDC4',  // Teal for China Standard Time
-                jst: '#95E1D3'   // Light teal for Japan Standard Time
-            };
-            
-            // Timezone configurations (order: ET, CT, PT, CET, IST, CST, JST)
-            const timezones = [
-                { name: 'ET', label: 'Eastern Time (ET)', hours: etBarHours, color: timezoneColors.et, offset: 'UTC-5/UTC-4' },
-                { name: 'CT', label: 'Central Time (CT)', hours: ctBarHours, color: timezoneColors.ct, offset: 'UTC-6/UTC-5' },
-                { name: 'PT', label: 'Pacific Time (PT)', hours: ptBarHours, color: timezoneColors.pt, offset: 'UTC-8/UTC-7' },
-                { name: 'CET', label: 'CET', hours: cetBarHours, color: timezoneColors.cet, offset: 'UTC+1' },
-                { name: 'IST', label: 'IST', hours: istBarHours, color: timezoneColors.ist, offset: 'UTC+5:30' },
-                { name: 'CST', label: 'CST', hours: cstBarHours, color: timezoneColors.cst, offset: 'UTC+8' },
-                { name: 'JST', label: 'JST', hours: jstBarHours, color: timezoneColors.jst, offset: 'UTC+9' }
-            ];
-            
-            ctx.save();
-            
-            // Calculate width of each hour segment
-            const firstX = xScale.getPixelForValue(0);
-            const secondX = xScale.getPixelForValue(1);
-            const segmentWidth = secondX - firstX;
-            
-            // Draw timezone bars (stacked vertically)
-            timezones.forEach((tz, tzIndex) => {
-                const rowTop = xAxisBottom + spacing + (tzIndex * (rowHeight + rowSpacing));
-                
-                labels.forEach((label, index) => {
-                    if (tz.hours[index]) {
-                        const x = xScale.getPixelForValue(index);
-                        const segmentLeft = x - segmentWidth / 2;
-                        
-                        // Draw rectangle for this hour segment
-                        ctx.fillStyle = tz.color;
-                        ctx.fillRect(segmentLeft, rowTop, segmentWidth, rowHeight);
-                    }
-                });
-            });
-            
-            // Draw "Timezone" label after the last timezone bar (matching "Hour" style)
-            const totalRowsHeight = timezones.length * rowHeight + (timezones.length - 1) * rowSpacing;
-            const lastBarBottom = xAxisBottom + spacing + totalRowsHeight;
-            const timezoneLabelY = lastBarBottom + 15; // Position after last bar with 10px margin top
-            const chartCenterX = chartArea.left + (chartArea.right - chartArea.left) / 2;
-            ctx.font = '12px Arial'; // Match Chart.js default axis title font
-            ctx.textAlign = 'center';
-            ctx.textBaseline = 'top';
-            ctx.fillStyle = '#666'; // Match Chart.js default axis title color
-            ctx.fillText('Timezone', chartCenterX, timezoneLabelY);
-            
-            // Draw legend below timezone label
-            const legendTop = timezoneLabelY + 20; // Space after "Timezone" label
-            ctx.font = '12px Arial';
-            ctx.textAlign = 'left';
-            ctx.textBaseline = 'top';
-            
-            // Calculate total width of legend items to center them
-            const legendRectSize = 15;
-            const legendItemSpacing = 20;
-            let totalLegendWidth = 0;
-            
-            // First pass: calculate total width
-            timezones.forEach((tz, index) => {
-                const textWidth = ctx.measureText(tz.name).width;
-                totalLegendWidth += legendRectSize + 8 + textWidth;
-                if (index < timezones.length - 1) {
-                    totalLegendWidth += legendItemSpacing;
-                }
-            });
-            
-            // Center the legend (reuse chartCenterX from above)
-            let legendX = chartCenterX - totalLegendWidth / 2;
-            const legendY = legendTop;
-            
-            // Second pass: draw legend items
-            timezones.forEach((tz, index) => {
-                // Draw colored rectangle for legend indicator
-                ctx.fillStyle = tz.color;
-                ctx.fillRect(legendX, legendY, legendRectSize, legendRectSize);
-                
-                // Draw legend text - only timezone abbreviation
-                ctx.fillStyle = '#000000';
-                const legendText = tz.name;
-                ctx.fillText(legendText, legendX + legendRectSize + 8, legendY + 1);
-                
-                // Move to next legend item (if not last)
-                if (index < timezones.length - 1) {
-                    const textWidth = ctx.measureText(legendText).width;
-                    legendX += legendRectSize + 8 + textWidth + legendItemSpacing;
-                }
-            });
-            
-            ctx.restore();
-        }
-    };
-
     const chart = new Chart(ctx, {
         type: 'line',
         data: {
             labels: labels,
             datasets: datasets
         },
-        plugins: [timezonePlugin],
         options: {
             responsive: true,
             maintainAspectRatio: false,
-            layout: {
-                padding: {
-                    bottom: 140 // Add padding at bottom for 7 timezone rows and legend (reduced for smaller bars)
-                }
-            },
             scales: {
                 y: {
                     beginAtZero: true,
@@ -786,8 +599,18 @@ function createStackedLatencyChart(measures) {
     // Define the specific order for test types
     const testTypeOrder = ['bash', 'curl io', 'curl io v2', 'debian package', 'sdkman package', 'java hello world'];
     
-    // Get test types in the specified order, only including those that have data
-    const testTypes = testTypeOrder.filter(testType => lastMeasures.hasOwnProperty(testType));
+    // Exclude curl io v2 and sdkman package
+    const excludedTestTypes = ['curl io v2', 'sdkman package'];
+    
+    // Get test types in the specified order, only including those that have data and are not excluded
+    const testTypes = testTypeOrder.filter(testType => 
+        lastMeasures.hasOwnProperty(testType) && !excludedTestTypes.includes(testType)
+    );
+    
+    // Map test-type names to display labels
+    const labelMap = {
+        'debian package': 'java 25'
+    };
     
     // Prepare data for stacked bar chart
     const latencyData = [];
@@ -804,10 +627,13 @@ function createStackedLatencyChart(measures) {
         cursorLatencyData.push(cursorLatency); // Cursor latency
     });
     
+    // Map labels for display
+    const displayLabels = testTypes.map(testType => labelMap[testType] || testType);
+    
     const chart = new Chart(ctx, {
         type: 'bar',
         data: {
-            labels: testTypes,
+            labels: displayLabels,
             datasets: [
                 {
                     label: 'Pipeline Latency',
@@ -833,7 +659,7 @@ function createStackedLatencyChart(measures) {
                     stacked: true,
                     title: {
                         display: true,
-                        text: 'Experiment (Test Type)'
+                        text: 'Test type'
                     }
                 },
                 y: {

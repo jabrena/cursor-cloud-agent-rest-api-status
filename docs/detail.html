@@ -181,15 +181,26 @@
                             <tr>
                                 <th>Time</th>
                                 <th>Status</th>
-                                <th>Test Type</th>
-                                <th>Pipeline Latency (sec)</th>
+                                <th>Test type</th>
+                                <th>Pipeline latency</th>
+                                <th>Cursor latency</th>
                             </tr>
                         </thead>
                         <tbody>
                 `;
 
+                // Map test-type names to display labels
+                const labelMap = {
+                    'debian package': 'java 25'
+                };
+                
                 hourMeasures.forEach(measure => {
                     const testType = measure['test-type'] || '-';
+                    const displayTestType = labelMap[testType] || testType;
+                    const cursorLatency = measure['cursor-latency'] && measure['cursor-latency'] !== '' 
+                        ? parseFloat(measure['cursor-latency']) || 0 
+                        : null;
+                    const cursorLatencyDisplay = cursorLatency !== null ? `${cursorLatency} sec` : '-';
                     tableHTML += `
                         <tr>
                             <td>${formatDateTime(measure.localdatetime)}</td>
@@ -198,9 +209,12 @@
                                     ${measure.status}
                                 </span>
                             </td>
-                            <td>${testType}</td>
+                            <td>${displayTestType}</td>
                             <td class="latency-cell">
                                 ${measure.latency} sec
+                            </td>
+                            <td class="latency-cell">
+                                ${cursorLatencyDisplay}
                             </td>
                         </tr>
                     `;
