@@ -14412,5 +14412,12 @@
     "latency": 81,
     "cursor-latency": 50,
     "test-type": "curl io"
+  },
+  {
+    "localdatetime": "20251204 12:22",
+    "status": "UP",
+    "latency": 82,
+    "cursor-latency": 46,
+    "test-type": "curl io v2"
   }
 ]
