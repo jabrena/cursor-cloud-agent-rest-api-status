@@ -23,6 +23,7 @@
         <!-- Maven plugin versions -->
         <maven-plugin-enforcer.version>3.6.2</maven-plugin-enforcer.version>
         <maven-plugin-compiler.version>3.14.1</maven-plugin-compiler.version>
+        <maven-plugin-versions.version>2.20.1</maven-plugin-versions.version>
     </properties>
 
     <!-- Build Configuration -->
@@ -69,6 +70,12 @@
                     <compilerArgument>--enable-preview</compilerArgument>
                     <release>${java.version}</release>
                 </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>versions-maven-plugin</artifactId>
+                <version>${maven-plugin-versions.version}</version>
             </plugin>
         </plugins>
     </build>
