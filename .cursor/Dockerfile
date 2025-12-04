@@ -11,12 +11,27 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     wget \
     git \
     sudo \
+    tree \
     ca-certificates \
     gnupg \
     build-essential \
     unzip \
     zip \
     && rm -rf /var/lib/apt/lists/*
+
+# Install Node.js (LTS version) via NodeSource
+RUN curl -fsSL https://deb.nodesource.com/setup_lts.x | bash - && \
+    apt-get install -y --no-install-recommends nodejs && \
+    rm -rf /var/lib/apt/lists/*
+
+# Verify Node.js and npm installation
+RUN node --version && npm --version && npx --version
+
+# Update DNS
+RUN cat /etc/resolv.conf
+RUN sudo sed 's/nameserver 1.1.1.1/nameserver 8.8.8.8/g' /etc/resolv.conf | sudo tee /etc/resolv.conf > /dev/null
+RUN grep -q "nameserver 8.8.8.8" /etc/resolv.conf || echo "nameserver 8.8.8.8" | sudo tee -a /etc/resolv.conf
+RUN cat /etc/resolv.conf
 
 # Set up SDKMAN environment (for developer user)
 ENV SDKMAN_DIR="/home/developer/.sdkman"
