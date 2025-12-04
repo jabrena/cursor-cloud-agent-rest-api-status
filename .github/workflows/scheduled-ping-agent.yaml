@@ -31,10 +31,22 @@ jobs:
           curl -Ls https://sh.jbang.dev | bash -s - app setup
           echo "$HOME/.jbang/bin" >> $GITHUB_PATH
 
+      - name: Trust jbang repository
+        run: |
+          jbang trust add https://github.com/jabrena/
+
       - name: Install jq
         run: |
           sudo apt-get update -qq
           sudo apt-get install -qq -y jq --no-install-recommends
+
+      - name: Execute Bash command (Cold Start)
+        continue-on-error: true
+        env:
+          CURSOR_API_KEY: ${{ secrets.CURSOR_API_KEY }}
+          GITHUB_ACTIONS: true
+        run: |
+          timeout 300 jbang churrera@jabrena run --workflow churrera-recipes/1-hello-world-bash/workflow.xml --show-logs --delete-on-success-completion
 
       - name: Execute Bash command
         continue-on-error: true
