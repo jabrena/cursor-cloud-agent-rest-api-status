@@ -14545,5 +14545,12 @@
     "latency": 81,
     "cursor-latency": 47,
     "test-type": "sdkman package"
+  },
+  {
+    "localdatetime": "20251204 13:40",
+    "status": "UP",
+    "latency": 92,
+    "cursor-latency": 40,
+    "test-type": "java hello world"
   }
 ]
