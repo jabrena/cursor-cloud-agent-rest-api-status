@@ -68,8 +68,8 @@ jobs:
             COMMITS=$(gh pr view "$pr_number" --json commits --jq '.commits[] | select(.author.login == "cursoragent" or .author.name == "cursoragent") | .oid')
             
             if [ -n "$COMMITS" ]; then
-              echo "PR #$pr_number has commits from cursoragent. Closing PR..."
-              gh pr close "$pr_number" --comment "This PR has been automatically closed because it contains commits from cursoragent."
+              echo "PR #$pr_number has commits from cursoragent. Closing PR silently..."
+              gh pr close "$pr_number"
               echo "Closed PR #$pr_number"
             else
               echo "PR #$pr_number does not have commits from cursoragent. Skipping."
