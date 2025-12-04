@@ -1,0 +1,10 @@
+{
+    "$schema": "https://cursor.com/schemas/environment.schema.json",
+    "name": "Cursor Cloud Agent Environment",
+    "description": "Base configuration for Cursor Cloud Agent",
+    "build": {
+        "dockerfile": "Dockerfile",
+        "context": "."
+    },
+    "terminals": []
+}
