@@ -194,7 +194,7 @@ if [ -n "$GITHUB_ACTIONS" ]; then
 fi
 
 # Read existing measures.json and add new entry
-MEASURES_FILE="docs/measures.json"
+MEASURES_FILE="docs/data/measures.json"
 
 # Check if file exists and has content
 if [ -f "$MEASURES_FILE" ] && [ -s "$MEASURES_FILE" ]; then

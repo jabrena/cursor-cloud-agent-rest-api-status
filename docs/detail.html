@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" href="favicon.ico" type="image/x-icon">
     <title>Hour Details - Cursor Cloud Agent REST API Status</title>
-    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="styles/styles.css">
     <style>
         .measures-table {
             width: 100%;
@@ -98,145 +98,7 @@
         <a href="https://github.com/jabrena/cursor-cloud-agent-rest-api-status" target="_blank" rel="noopener noreferrer" style="display: inline-flex; align-items: center; text-decoration: none; margin-right: 4px; margin-top: 20px; margin-bottom: 10px;"><svg width="25" height="25" viewBox="0 0 16 16" fill="currentColor" style="vertical-align: middle;"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.012 8.012 0 0 0 16 8c0-4.42-3.58-8-8-8z"/></svg></a>
     </footer>
 
-    <script>
-        // Parse datetime from format "YYYYMMDD HH:MM" (treating as UTC)
-        function parseDateTime(dateTimeStr) {
-            const [dateStr, timeStr] = dateTimeStr.split(' ');
-            const year = dateStr.substring(0, 4);
-            const month = dateStr.substring(4, 6);
-            const day = dateStr.substring(6, 8);
-            const [hour, minute] = timeStr.split(':');
-            // Parse as UTC since the data format represents UTC time
-            return new Date(Date.UTC(year, month - 1, day, hour, minute));
-        }
-
-        // Format datetime for display
-        function formatDateTime(dateTimeStr) {
-            const date = parseDateTime(dateTimeStr);
-            return date.toLocaleString('en-US', {
-                year: 'numeric',
-                month: '2-digit',
-                day: '2-digit',
-                hour: '2-digit',
-                minute: '2-digit',
-                hour12: false
-            });
-        }
-
-        // Load and display measures for the specified hour
-        async function loadHourMeasures() {
-            try {
-                // Get hour from URL parameters
-                const urlParams = new URLSearchParams(window.location.search);
-                const hour = parseInt(urlParams.get('hour'));
-                
-                if (isNaN(hour) || hour < 0 || hour > 23) {
-                    document.getElementById('hour-header').textContent = 'Invalid hour parameter';
-                    document.getElementById('measures-container').innerHTML = 
-                        '<div class="no-data">Please provide a valid hour (0-23) in the URL.</div>';
-                    return;
-                }
-
-                // Update header
-                const hourFormatted = hour.toString().padStart(2, '0') + ':00';
-                document.getElementById('hour-header').textContent = `Measures for ${hourFormatted}`;
-
-                // Load measures
-                const response = await fetch('measures.json');
-                const allMeasures = await response.json();
-
-                // Filter measures for the specified hour from the last 24 hours (UTC)
-                const now = new Date();
-                const last24Hours = new Date(now.getTime() - 24 * 60 * 60 * 1000);
-                
-                const hourMeasures = allMeasures.filter(measure => {
-                    const measureDate = parseDateTime(measure.localdatetime);
-                    // Check if measure is within last 24 hours and matches the UTC hour
-                    return measureDate >= last24Hours && measureDate.getUTCHours() === hour;
-                });
-
-                // Sort by datetime (oldest first)
-                hourMeasures.sort((a, b) => {
-                    const dateA = parseDateTime(a.localdatetime);
-                    const dateB = parseDateTime(b.localdatetime);
-                    return dateA - dateB;
-                });
-
-                // Display measures
-                const container = document.getElementById('measures-container');
-                
-                if (hourMeasures.length === 0) {
-                    container.innerHTML = `<div class="no-data">No measures found for ${hourFormatted}</div>`;
-                    return;
-                }
-
-                // Update header with count
-                document.getElementById('hour-header').textContent = 
-                    `Measures for ${hourFormatted} UTC (${hourMeasures.length} measure${hourMeasures.length !== 1 ? 's' : ''})`;
-
-                // Create table
-                let tableHTML = `
-                    <table class="measures-table">
-                        <thead>
-                            <tr>
-                                <th>Time</th>
-                                <th>Status</th>
-                                <th>Test type</th>
-                                <th>Pipeline latency</th>
-                                <th>Cursor latency</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                `;
-
-                // Map test-type names to display labels
-                const labelMap = {
-                    'debian package': 'java 25'
-                };
-                
-                hourMeasures.forEach(measure => {
-                    const testType = measure['test-type'] || '-';
-                    const displayTestType = labelMap[testType] || testType;
-                    const cursorLatency = measure['cursor-latency'] && measure['cursor-latency'] !== '' 
-                        ? parseFloat(measure['cursor-latency']) || 0 
-                        : null;
-                    const cursorLatencyDisplay = cursorLatency !== null ? `${cursorLatency} sec` : '-';
-                    tableHTML += `
-                        <tr>
-                            <td>${formatDateTime(measure.localdatetime)}</td>
-                            <td>
-                                <span class="status-badge ${measure.status.toLowerCase()}">
-                                    ${measure.status}
-                                </span>
-                            </td>
-                            <td>${displayTestType}</td>
-                            <td class="latency-cell">
-                                ${measure.latency} sec
-                            </td>
-                            <td class="latency-cell">
-                                ${cursorLatencyDisplay}
-                            </td>
-                        </tr>
-                    `;
-                });
-
-                tableHTML += `
-                        </tbody>
-                    </table>
-                `;
-
-                container.innerHTML = tableHTML;
-            } catch (error) {
-                console.error('Error loading data:', error);
-                document.getElementById('hour-header').textContent = 'Error loading data';
-                document.getElementById('measures-container').innerHTML = 
-                    '<div class="no-data">An error occurred while loading the measures.</div>';
-            }
-        }
-
-        // Load data when page loads
-        loadHourMeasures();
-    </script>
+    <script type="module" src="scripts/detail.js"></script>
 </body>
 </html>
 

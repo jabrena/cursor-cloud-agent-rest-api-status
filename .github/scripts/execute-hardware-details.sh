@@ -44,7 +44,7 @@ NEW_JSON_FILE=$(mktemp)
 cat "$OUTPUT_FILE" | ./.github/scripts/extract-result-json.sh > "$NEW_JSON_FILE"
 
 # Ensure hardware.json exists and is a valid JSON array
-HARDWARE_FILE="docs/hardware.json"
+HARDWARE_FILE="docs/data/hardware.json"
 if [ ! -f "$HARDWARE_FILE" ] || [ ! -s "$HARDWARE_FILE" ]; then
     echo "[]" > "$HARDWARE_FILE"
 fi
