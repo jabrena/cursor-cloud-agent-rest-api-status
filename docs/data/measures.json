@@ -17688,5 +17688,12 @@
     "latency": 160,
     "cursor-latency": 27,
     "test-type": "debian package"
+  },
+  {
+    "localdatetime": "20251208 23:05",
+    "status": "UP",
+    "latency": 99,
+    "cursor-latency": 0,
+    "test-type": "bash"
   }
 ]
