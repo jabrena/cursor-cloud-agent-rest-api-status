@@ -20096,5 +20096,12 @@
     "latency": 82,
     "cursor-latency": 12,
     "test-type": "debian package"
+  },
+  {
+    "localdatetime": "20251212 15:13",
+    "status": "DOWN",
+    "latency": 301,
+    "cursor-latency": "",
+    "test-type": "java hello world"
   }
 ]
