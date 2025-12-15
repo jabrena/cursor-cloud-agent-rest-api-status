@@ -22210,5 +22210,12 @@
     "latency": 41,
     "cursor-latency": 0,
     "test-type": "bash"
+  },
+  {
+    "localdatetime": "20251215 19:06",
+    "status": "UP",
+    "latency": 61,
+    "cursor-latency": "",
+    "test-type": "curl io"
   }
 ]
