@@ -26214,5 +26214,12 @@
     "latency": 79,
     "cursor-latency": 0,
     "test-type": "debian package"
+  },
+  {
+    "localdatetime": "20251221 18:07",
+    "status": "UP",
+    "latency": 79,
+    "cursor-latency": 35,
+    "test-type": "java hello world"
   }
 ]
