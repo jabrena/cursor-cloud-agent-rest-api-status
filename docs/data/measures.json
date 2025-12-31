@@ -32745,5 +32745,12 @@
     "latency": 58,
     "cursor-latency": 4,
     "test-type": "java hello world"
+  },
+  {
+    "localdatetime": "20251231 13:13",
+    "status": "UP",
+    "latency": 50,
+    "cursor-latency": 10,
+    "test-type": "bash"
   }
 ]
