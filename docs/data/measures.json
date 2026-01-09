@@ -38723,5 +38723,12 @@
     "latency": 78,
     "cursor-latency": 16,
     "test-type": "curl io"
+  },
+  {
+    "localdatetime": "20260109 10:06",
+    "status": "UP",
+    "latency": 78,
+    "cursor-latency": 15,
+    "test-type": "debian package"
   }
 ]
