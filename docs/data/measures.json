@@ -40214,5 +40214,12 @@
     "latency": 72,
     "cursor-latency": 22,
     "test-type": "bash"
+  },
+  {
+    "localdatetime": "20260111 16:09",
+    "status": "UP",
+    "latency": 59,
+    "cursor-latency": 29,
+    "test-type": "debian package"
   }
 ]
