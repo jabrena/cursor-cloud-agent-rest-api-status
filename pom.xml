@@ -22,7 +22,7 @@
 
         <!-- Maven plugin versions -->
         <maven-plugin-enforcer.version>3.6.2</maven-plugin-enforcer.version>
-        <maven-plugin-compiler.version>3.14.1</maven-plugin-compiler.version>
+        <maven-plugin-compiler.version>3.15.0</maven-plugin-compiler.version>
         <maven-plugin-versions.version>2.20.1</maven-plugin-versions.version>
     </properties>
 
